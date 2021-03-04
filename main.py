@@ -1,7 +1,14 @@
-from elasticsearch import Elasticsearch, helpers
-import csv
-import pandas as pd
+# pip install pandas
+# pip install elasticsearch
+# using Python 3.9.0
+# make sure to run elasticsearch.bat
+
 from timeit import default_timer as timer
+import pandas as pd
+import csv
+from elasticsearch import Elasticsearch, helpers
+import re as re
+
 
 steamAppsIndex = 'steamapps'
 
@@ -11,33 +18,51 @@ def init():
     return es
 
 
-def preprocess(steamtPath, tagsPath, outputPath):
+def preprocess(steamtPath, tagsPath, descriptionPath, outputPath):
+    print('preprocessing dataset...')
+    start = timer()
 
     fields = ['appid', 'name', 'positive_ratings',
               'negative_ratings', 'owners', 'price']
     df = pd.read_csv(steamtPath, index_col='appid', usecols=fields)
 
-    tags = ['action', 'indie', 'adventure', 'multiplayer', 'singleplayer',
-            'casual', 'rpg', 'strategy', 'open_world', 'simulation']
-
-    fields = ['appid'] + tags
-    tagsDb = pd.read_csv(tagsPath, index_col='appid', usecols=fields)
-
-    tagsDb['tagCount'] = tagsDb.sum(axis=1, skipna=True)
-
-    # assign boolean value for each tag (ignoring appid field)
-    userAgreementTreshold = 0.1
-    for tag in tags:
-        df[tag] = tagsDb[tag] > userAgreementTreshold * tagsDb['tagCount']
+    # clean owners into single number (center of band)
+    df['owners'] = (df['owners'].str.split('-').str[0].astype(int) +
+                    df['owners'].str.split('-').str[1].astype(int)) // 2
 
     # join positive and negative ratings into single score
     df['rating'] = df['positive_ratings'] - df['negative_ratings']
     df = df.drop(['positive_ratings', 'negative_ratings'], axis=1)
 
-    # clean owners into single number (center of band)
-    df['owners'] = (df['owners'].str.split('-').str[0].astype(int) +
-                    df['owners'].str.split('-').str[1].astype(int)) // 2
+    tags = ['action', 'indie', 'adventure', 'multiplayer', 'singleplayer',
+            'casual', 'rpg', 'strategy', 'open_world', 'simulation']
+
+    fields = ['appid'] + tags
+    tagsDf = pd.read_csv(tagsPath, index_col='appid', usecols=fields)
+
+    tagsDf['tagCount'] = tagsDf.sum(axis=1, skipna=True)
+
+    # assign boolean value for each tag (ignoring appid field)
+    userAgreementTreshold = 0.1
+    for tag in tags:
+        df[tag] = tagsDf[tag] > userAgreementTreshold * tagsDf['tagCount']
+
+    # get game descriptions
+    fields = ['steam_appid', 'detailed_description',
+              'about_the_game', 'short_description']
+    descDf = pd.read_csv(
+        descriptionPath, index_col='steam_appid', usecols=fields)
+
+    # remove html tags
+    df['about_the_game'] = descDf['about_the_game'].apply(
+        lambda x: re.sub('<.*?>', '', x))
+    df['short_description'] = descDf['short_description'].apply(
+        lambda x: re.sub('<.*?>', '', x))
+    df['detailed_description'] = descDf['detailed_description'].apply(
+        lambda x: re.sub('<.*?>', '', x))
+
     print(df)
+    print(f'finished preprocessing in {timer()-start}s')
     df.to_csv(path_or_buf=outputPath)
 
 
@@ -77,6 +102,7 @@ def query(es, settings):
     for hit in result['hits']['hits']:
         print(f'{hit["_source"]["name"]}')
         print(f'${hit["_source"]["price"]} rating: {hit["_source"]["rating"]}')
+        print(f'{hit["_source"]["short_description"]}')
         print('================')
     return result
 
@@ -88,8 +114,9 @@ def main():
     # preprocess data
     steamtPath = 'data/steam.csv'
     tagsPath = 'data/steamspy_tag_data.csv'
+    descriptionPath = 'data/steam_description_data.csv'
     datasetPath = 'temp/dataset.csv'
-    preprocess(steamtPath, tagsPath, outputPath=datasetPath)
+    preprocess(steamtPath, tagsPath, descriptionPath, outputPath=datasetPath)
 
     # index/update steamapps from csv file
     indexSteamApps(es, datasetPath)
