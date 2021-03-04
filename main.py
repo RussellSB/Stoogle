@@ -1,7 +1,7 @@
-from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
 import csv
 import pandas as pd
+from timeit import default_timer as timer
 
 steamAppsIndex = 'steamapps'
 
@@ -11,11 +11,11 @@ def init():
     return es
 
 
-def preprocess(datasetPath, tagsPath):
+def preprocess(steamtPath, tagsPath, outputPath):
 
     fields = ['appid', 'name', 'positive_ratings',
               'negative_ratings', 'owners', 'price']
-    df = pd.read_csv(datasetPath, index_col='appid', usecols=fields)
+    df = pd.read_csv(steamtPath, index_col='appid', usecols=fields)
 
     tags = ['action', 'indie', 'adventure', 'multiplayer', 'singleplayer',
             'casual', 'rpg', 'strategy', 'open_world', 'simulation']
@@ -37,8 +37,8 @@ def preprocess(datasetPath, tagsPath):
     # clean owners into single number (center of band)
     df['owners'] = (df['owners'].str.split('-').str[0].astype(int) +
                     df['owners'].str.split('-').str[1].astype(int)) // 2
-    print(tagsDb)
     print(df)
+    df.to_csv(path_or_buf=outputPath)
 
 
 def indexSteamApps(es, datasetPath):
@@ -47,23 +47,34 @@ def indexSteamApps(es, datasetPath):
     # erase previous index
     es.indices.delete(index=steamAppsIndex, ignore=[
                       400, 404])
+    start = timer()
 
     with open(datasetPath, encoding='utf8', errors='replace') as f:
         reader = csv.DictReader(f)
-        response = helpers.bulk(es, reader, index=steamAppsIndex)
-        print("RESPONSE:", response)
+        #response = helpers.bulk(es, reader, index=steamAppsIndex)
+        for success, info in helpers.parallel_bulk(es, reader, index=steamAppsIndex):
+            if not success:
+                print(f'A document failed: {info}')
+
+    print(f'finished indexing in {timer() - start}s')
 
     es.indices.refresh(index=steamAppsIndex)
 
 
 def query(es, settings):
-    total_docs = 12
+    start = timer()
+
+    total_docs = 8
     result = es.search(index=steamAppsIndex, body={
         "query": settings}, size=total_docs)
 
-    print("Got %d Hits:" % result['hits']['total']['value'])
+    print(
+        f"Got {result['hits']['total']['value']} Hits in {timer() - start}s:")
+
+    print('')
     for hit in result['hits']['hits']:
         print(f'{hit["_source"]["name"]}')
+        print(f'${hit["_source"]["price"]} rating: {hit["_source"]["rating"]}')
         print('================')
     return result
 
@@ -73,15 +84,16 @@ def main():
     es = init()
 
     # preprocess data
-    datasetPath = 'data/steam.csv'
+    steamtPath = 'data/steam.csv'
     tagsPath = 'data/steamspy_tag_data.csv'
-    preprocess(datasetPath, tagsPath)
+    datasetPath = 'temp/dataset.csv'
+    preprocess(steamtPath, tagsPath, outputPath=datasetPath)
 
     # index/update steamapps from csv file
     indexSteamApps(es, datasetPath)
 
     # test querry
-    settings = {"match": {'name': 'Counter-Strike'}}
+    settings = {"match": {'name': 'Worms'}}
     result = query(es, settings)
 
     # TODO: sort, filter and display result
