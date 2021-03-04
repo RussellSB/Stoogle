@@ -56,20 +56,22 @@ def indexSteamApps(es, datasetPath):
             if not success:
                 print(f'A document failed: {info}')
 
-    print(f'finished indexing in {timer() - start}s')
+    print(f'finished indexing in {timer()-start}s')
 
     es.indices.refresh(index=steamAppsIndex)
 
 
 def query(es, settings):
+    print('')
+    print(settings)
     start = timer()
 
     total_docs = 8
     result = es.search(index=steamAppsIndex, body={
         "query": settings}, size=total_docs)
 
-    print(
-        f"Got {result['hits']['total']['value']} Hits in {timer() - start}s:")
+    print('')
+    print(f"Got {result['hits']['total']['value']} Hits in {timer()-start}s:")
 
     print('')
     for hit in result['hits']['hits']:
