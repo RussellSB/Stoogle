@@ -4,8 +4,22 @@ body {
     padding: 40px;
     font-family: Arial;
     text-align: center;
-  }
-
+}
 .title{
       font-size: 10em;
-  }
+}
+.OnContainer{
+    padding-top: 5em;
+    justify-content: center;
+    display: flex;
+}
+.sortBy{
+    width: 8em;
+    background: blue; 
+    padding: 0.25em;
+}
+.tags{
+    width: 8em;
+    background: red; 
+    padding: 0.25em;
+}
