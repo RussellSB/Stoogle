@@ -1,21 +1,26 @@
-import '../styles/SearchBar.css'
+import { Input } from 'antd';
+const { Search } = Input;
 
-const SearchBar = ({keyword,setKeyword}) => {
+const onSearch = () => {    
+    // TODO
+}
+
+const searchStyle = {
+    width: 390, 
+    fontFamily: 'Arial',
+    filter: 'invert(82%)'
+}
+
+
+const SearchBar = () => {
     return (
-        <div className='mainContainer'>
-            <input 
-                className='Container'
-                key="random1"
-                value={keyword}
-                placeholder={"Search video game"}
-                onChange={(e) => setKeyword(e.target.value)}
-            />
-            <button className='Button'>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-search" viewBox="0 0 16 16">
-                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                </svg>
-            </button>
-        </div>
+        <Search 
+            placeholder="Search video game..." 
+            onSearch={onSearch} 
+            enterButton 
+            size='small'
+            style={searchStyle}
+        />
       
     );
 }

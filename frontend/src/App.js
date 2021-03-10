@@ -1,4 +1,5 @@
 
+import 'antd/dist/antd.css';
 import Onboarding from './pages/Onboarding'
 
 const App = () => {
