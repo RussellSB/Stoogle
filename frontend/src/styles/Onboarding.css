@@ -8,18 +8,27 @@ body {
 .title{
       font-size: 10em;
 }
-.OnContainer{
-    padding-top: 5em;
+.botContainer{
+    padding-top: 2em;
     justify-content: center;
     display: flex;
 }
+.subBotContainer{
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    text-align: left;
+    
+}
+.subBotContainerTitle{
+
+}
 .sortBy{
-    width: 8em;
-    background: blue; 
-    padding: 0.25em;
+    width: 10em;
+    background: blue;
+    margin-top: -6pt;
 }
 .tags{
-    width: 8em;
-    background: red; 
-    padding: 0.25em;
+    background: red;
+    width: 10em;
+    margin-top: -6pt;
 }

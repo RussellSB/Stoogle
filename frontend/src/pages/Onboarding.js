@@ -15,13 +15,19 @@ const Onboarding = () => {
                  * Tags (use state)
                  * 
                 */}
-                <div className='OnContainer'>
-                    <div className='sortBy'>
-                        <p>test</p>
+                <div className='botContainer'>
+                    <div className='subBotContainer'>
+                        <p>Sort by</p>
+                        <div className='sortBy'>
+                            <p>test</p>
+                        </div>
                     </div>
 
-                    <div className='tags'>
-                        <p>test</p>
+                    <div className='subBotContainer'>
+                        <p>Tags</p>
+                        <div className='tags'>
+                            <p>test</p>
+                        </div>
                     </div>
                 </div>
 
