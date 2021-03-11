@@ -17,17 +17,16 @@ const handleChange = (value) => {
 }
 
 const selectStyle = {
-    maxWidth: 200, 
+    maxWidth: 250, 
     
     minWidth: 130, 
-    fontFamily: 'Arial',
     filter: 'invert(82%)',
 }
 
 const Tags = () => {
     return (
         <Select
-            size='small'
+            size='large'
             mode="multiple"
             listHeight={120}
             allowClear

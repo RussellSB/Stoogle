@@ -6,8 +6,7 @@ const onSearch = () => {
 }
 
 const searchStyle = {
-    width: 390, 
-    fontFamily: 'Arial',
+    width: 400, 
     filter: 'invert(82%)'
 }
 
@@ -18,7 +17,7 @@ const SearchBar = () => {
             placeholder="Search video game..." 
             onSearch={onSearch} 
             enterButton 
-            size='small'
+            size='large'
             style={searchStyle}
         />
       

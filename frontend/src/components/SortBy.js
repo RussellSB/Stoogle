@@ -8,14 +8,13 @@ const handleChange = (value) => {
 
 const selectStyle = {
     width: 130, 
-    fontFamily: 'Arial',
     filter: 'invert(82%)'
 }
 
 const SortBy = () => {
     return (
         <Select 
-            size='small'
+            size='large'
             defaultValue="relevancy" 
             style={selectStyle} 
             onChange={handleChange}
