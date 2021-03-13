@@ -11,19 +11,24 @@ for (let i = 0; i < tags.length; i++) {
     children.push(<Option key={i}>{tags[i]}</Option>);
   }
 
-const handleChange = (value) => {
-    // TODO
-    console.log(`selected ${value}`);
-}
-
 const selectStyle = {
     maxWidth: 250, 
-    
     minWidth: 130, 
     filter: 'invert(82%)',
 }
 
-const Tags = () => {
+const removeWord = (array, word) => {
+    let arr = []
+    for(let i=0; i < array.length; i++){
+	if(array[i] != word){
+	   arr.push(array[i])
+	}
+    }
+
+    return arr
+}
+
+const Tags = (props) => {
     return (
         <Select
             size='large'
@@ -33,7 +38,8 @@ const Tags = () => {
             style={selectStyle}
             dropdownStyle={selectStyle}
             placeholder="Filter by tag..."
-            onChange={handleChange}
+	    onDeselect={i => props.setTags(removeWord(props.tags, tags[i]))}
+	    onSelect={i => props.setTags([...props.tags, tags[i]])}
         >
         {children}
         </Select>

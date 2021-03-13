@@ -1,23 +1,18 @@
 import { Select } from 'antd'
 const { Option } = Select;
 
-const handleChange = (value) => {
-    // TODO
-    console.log(`selected ${value}`);
-}
-
 const selectStyle = {
     width: 130, 
     filter: 'invert(82%)'
 }
 
-const SortBy = () => {
+const SortBy = (props) => {
     return (
         <Select 
             size='large'
             defaultValue="relevancy" 
             style={selectStyle} 
-            onChange={handleChange}
+            onChange={props.setSortBy}
             dropdownStyle={selectStyle}
         >
             
