@@ -5,11 +5,44 @@ import {useState} from 'react'
 import Results from './pages/Results'
 
 const App = () => {
-  const [page, setPage] = useState('results') // onboarding
+
+   const [search, setSearch] = useState('')
+   const [sortBy, setSortBy] = useState('relevancy')
+   const [tags, setTags] = useState([])
+   const [maxPrice, setMaxPrice] = useState(500)
+   const [page, setPage] = useState('onboarding') // onboarding
+  	
+   const onSearch = () => {    
+      let d = {search, sortBy, maxPrice: 1000, tags}
+      console.log(d)
+      setPage('results')
+   }
+
   return (
      <div>
-        {page == 'onboarding' && <Onboarding setPage={setPage}/>}
-        {page == 'results' && <Results setPage={setPage}/>}
+        {page == 'onboarding' && <Onboarding 
+                                    setPage={setPage} 
+                                    setSearch={setSearch} 
+                                    onSearch={onSearch}
+                                    setSortBy={setSortBy} 
+                                    setMaxPrice={setMaxPrice} 
+                                    setTags={setTags}
+                                    tags={tags}
+                                 />
+        }
+
+        {page == 'results' && <Results 
+                                    setPage={setPage} 
+                                    setSearch={setSearch} 
+                                    onSearch={onSearch}
+                                    setSortBy={setSortBy} 
+                                    setMaxPrice={setMaxPrice} 
+                                    setTags={setTags}
+                                    tags={tags}
+
+                                    
+                                 />
+         }
      </div>
   );
 }
