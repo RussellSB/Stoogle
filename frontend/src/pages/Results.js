@@ -41,13 +41,18 @@ const Results = (props) => {
 
 	    <div className='header'>
 	    	<div className='titleSmall'>St<span className='oo'>oo</span>gle</div>
-	    	<SearchBar setSearch={props.setSearch} onSearch={props.onSearch} width={800}/>
+	    	<SearchBar 
+                setSearch={props.setSearch} 
+                onSearch={props.onSearch} 
+                search={props.search} 
+                width={800}
+            />
 	    </div>
 	    
         <div className='bot'>
 
             <div className='results'>
-                <ItemList onCheck={props.onCheck} data={data}/>
+                <ItemList onCheck={onCheck} data={data}/>
             </div>
 
             <div className='subBot'>
@@ -55,28 +60,40 @@ const Results = (props) => {
                 <div className='subBotContainerR'>
                         <p>Max Price</p>
                         <div className='maxPriceR'>
-                            <MaxPrice setMaxPrice={props.setMaxPrice} />
+                            <MaxPrice 
+                                setMaxPrice={props.setMaxPrice}     
+                            />
                         </div>
                 </div>
 
                 <div className='subBotContainerR'>
                     <p>Tags</p>
                     <div className='tagsR'>
-                        <Tags setTags={props.setTags} tags={props.tags} maxWidth={280} minWidth={280} listHeight={120}/>
+                        <Tags 
+                            setTags={props.setTags} 
+                            tags={props.tags} 
+                            maxWidth={280} 
+                            minWidth={280} 
+                            listHeight={120}
+                        />
                     </div>
                 </div>
 
                 <div className='subBotContainerR'>
                     <p>Sort by</p>
                     <div className='sortByR'>
-                        <SortBy setSortBy={props.setSortBy}  width={280}/>
+                        <SortBy 
+                            setSortBy={props.setSortBy} 
+                            sortBy={props.sortBy} 
+                            width={280}
+                        />
                     </div>
                 </div>
 
                 <div className='subBotContainerR'>
                     <p>Save</p>
                     <div className='saveR'>
-                        <Save onSave={props.onSave} width={280}/>
+                        <Save onSave={onSave} width={280}/>
                     </div>
                 </div>
                 

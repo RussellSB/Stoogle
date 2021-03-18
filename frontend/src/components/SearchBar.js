@@ -17,6 +17,7 @@ const SearchBar = (props) => {
             enterButton 
             size='large'
             style={searchStyle}
+            value={props.search}
         />
       
     );

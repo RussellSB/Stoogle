@@ -40,8 +40,9 @@ const Tags = (props) => {
             style={selectStyle}
             dropdownStyle={selectStyle}
             placeholder="Filter by tag..."
-	    onDeselect={i => props.setTags(removeWord(props.tags, tags[i]))}
-	    onSelect={i => props.setTags([...props.tags, tags[i]])}
+	        onDeselect={i => props.setTags(removeWord(props.tags, tags[i]))}
+	        onSelect={i => props.setTags([...props.tags, tags[i]])}
+            value={props.tags}
         >
         {children}
         </Select>

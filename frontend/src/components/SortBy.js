@@ -13,6 +13,7 @@ const SortBy = (props) => {
             size='large'
             defaultValue="relevancy" 
             style={selectStyle} 
+            value={props.sortBy}
             onChange={props.setSortBy}
             dropdownStyle={selectStyle}
         >

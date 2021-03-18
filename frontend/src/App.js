@@ -38,9 +38,10 @@ const App = () => {
                                     setSortBy={setSortBy} 
                                     setMaxPrice={setMaxPrice} 
                                     setTags={setTags}
-                                    tags={tags}
 
-                                    
+                                    tags={tags}
+                                    sortBy={sortBy}
+                                    search={search}
                                  />
          }
      </div>
