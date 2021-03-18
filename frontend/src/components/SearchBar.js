@@ -1,18 +1,19 @@
 import { Input } from 'antd';
 const { Search } = Input;
 
-const searchStyle = {
-    width: 400, 
-    filter: 'invert(82%)'
-}
-
 
 const SearchBar = (props) => {
+
+    const searchStyle = {
+        width: props.width, 
+        filter: 'invert(82%)'
+    }
+
     return (
         <Search 
             placeholder="Search video game..." 
             onSearch={props.onSearch}
-	    onChange={e => props.setSearch(e.target.value)}
+	        onChange={e => props.setSearch(e.target.value)}
             enterButton 
             size='large'
             style={searchStyle}

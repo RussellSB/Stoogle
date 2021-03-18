@@ -1,12 +1,13 @@
 import { Select } from 'antd'
 const { Option } = Select;
 
-const selectStyle = {
-    width: 130, 
-    filter: 'invert(82%)'
-}
-
 const SortBy = (props) => {
+
+    const selectStyle = {
+        width: props.width, 
+        filter: 'invert(82%)'
+    }
+
     return (
         <Select 
             size='large'

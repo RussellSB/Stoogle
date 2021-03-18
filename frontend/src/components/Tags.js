@@ -11,12 +11,6 @@ for (let i = 0; i < tags.length; i++) {
     children.push(<Option key={i}>{tags[i]}</Option>);
   }
 
-const selectStyle = {
-    maxWidth: 250, 
-    minWidth: 130, 
-    filter: 'invert(82%)',
-}
-
 const removeWord = (array, word) => {
     let arr = []
     for(let i=0; i < array.length; i++){
@@ -29,11 +23,19 @@ const removeWord = (array, word) => {
 }
 
 const Tags = (props) => {
+
+    const selectStyle = {
+        maxWidth: props.maxWidth, 
+        minWidth: props.minWidth,
+        filter: 'invert(82%)',
+    }
+    
+
     return (
         <Select
             size='large'
             mode="multiple"
-            listHeight={120}
+            listHeight={props.listHeight}
             allowClear
             style={selectStyle}
             dropdownStyle={selectStyle}
