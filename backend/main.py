@@ -230,7 +230,6 @@ def generate_settings(selection_index, title, bool_op_index, categories_index, f
 
 
 def main():
-    # connect to Elasticsearch server
     es = init()
 
     # preprocess data
@@ -244,40 +243,47 @@ def main():
     indexSteamApps(es, datasetPath)
 
     categories = ['NAME', 'PRICE', 'RATING', 'SHORT_DESCRIPTION', 'OWNERS', 'TAGS']
+    continue_search = 1
 
     # test query
-    selection_index = int(input("Enter selection_index :"))  # 4
-    title = str(input("Enter title : "))  # 'Counter-Strike'
-    bool_op_index = int(input("Enter Desired Boolean Operation : "))  # 0
-    categories_index = int(input("Enter Category Index : "))  # 0
-    filter_operation_index = int(input("Enter Filter Operation Index : "))  # 0
-    threshold = float(input("Enter Threshold : "))  # 3.0
-    total_docs = int(input("Enter Number of Documents Desired : "))  # 3.0
+    while continue_search != 0:
+        print('====NEW SEARCH =====')
+        selection_index = int(input("Enter selection_index :"))  # 4
+        title = str(input("Enter title : "))  # 'Counter-Strike'
+        bool_op_index = int(input("Enter Desired Boolean Operation : "))  # 0
+        categories_index = int(input("Enter Category Index : "))  # 0
+        filter_operation_index = int(input("Enter Filter Operation Index : "))  # 0
+        threshold = float(input("Enter Threshold : "))  # 3.0
+        total_docs = int(input("Enter Number of Documents Desired : "))  # 10
 
-    settings = generate_settings(selection_index, title, bool_op_index, categories_index, filter_operation_index,
-                                 threshold)
-    result = query(es, settings, total_docs)
+        settings = generate_settings(selection_index, title, bool_op_index, categories_index, filter_operation_index,
+                                     threshold)
+        result = query(es, settings, total_docs)
 
-    # TODO: sort, filter and display result
-    ascending = bool(input("Ascending (True) or Descending (False) Order : "))  # False
-    print('Categories: ', result.columns)
-    sorting_criteria_index = int(input("Enter Sorting Criteria Index : "))  # 0
-    sorting_criteria = [categories[sorting_criteria_index]]
-    sorted_data = sorting(result, sorting_criteria, ascending)
+        # TODO: sort, filter and display result
+        ascending = bool(input("Ascending (True) or Descending (False) Order : "))  # False
+        print('Categories: ', result.columns)
+        en = True
+        sorting_criteria_index = int(input("Enter Sorting Criteria Index : "))  # 0
+        sorting_criteria = [categories[sorting_criteria_index]]
+        sorted_data = sorting(df=result, en=en, sorting_criteria=sorting_criteria, ascending=ascending)
 
-    print('Categories: ', sorted_data.columns)
-    category_to_remove_index = int(input("Enter Category Index to Remove :"))  # 4
-    categories.remove(categories[category_to_remove_index])
-    filtered_data = filtering(df=sorted_data, items=categories)
+        print('Categories: ', sorted_data.columns)
+        category_to_remove_index = int(input("Enter Category Index to Remove :"))  # 4
+        categories.remove(categories[category_to_remove_index])
+        filtered_data = filtering(df=sorted_data, items=categories, en=en)
 
-    print('Categories: ', filtered_data.columns)
-    category = categories[int(input("Enter Category Index to search for Substring :"))]
-    substring = float(input("Enter word to search for : "))  # simulation
-    data_with_string = substring_search(filtered_data, category, substring)
+        print('Categories: ', filtered_data.columns)
+        category = categories[int(input("Enter Category Index to search for Substring :"))]
+        substring = str(input("Enter word to search for : "))  # simulation
+        data_with_string = substring_search(df=filtered_data, category=category, substring=substring, en=en)
 
-    print_the_data(result, sorted_data, filtered_data, data_with_string)
+        print_the_data(result, sorted_data, filtered_data, data_with_string)
+        print('Do you wish to terminate the program [0] or start a new search [any number]?')
+        continue_search = int(input("Terminate [0] or Start New Search [Number]: "))
 
     print('exit')
+ # connect to Elasticsearch server
 
 
 if __name__ == "__main__":
