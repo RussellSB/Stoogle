@@ -157,35 +157,38 @@ def query(es, settings, total_docs):
     return result
 
 
-def sorting(df, sorting_criteria, ascending):
+def sorting(df, en, sorting_criteria, ascending):
     """
     :param df: an input dataframe
     :param sorting_criteria: the parameters by which you wish to sort
     :param ascending: boolean value
     :return: sorted dataframe
     """
-    df = df.sort_values(by=sorting_criteria, ascending=ascending)
+    if en:
+        df = df.sort_values(by=sorting_criteria, ascending=ascending)
     return df
 
 
-def filtering(df, items):
+def filtering(df, en, items):
     """
     :param df: an input dataframe
     :param items: the columns you would like to keep
     :return: dataframe with specified columns
     """
-    df = df.filter(items=items)
+    if en:
+        df = df.filter(items=items)
     return df
 
 
-def substring_search(df, category, substring):
+def substring_search(df, en, category, substring):
     """
     :param df: input data frame
     :param category: the column you would like to search a string for
     :param substring: the string to check for
     :return: dataframe with entries containing specified string in specified column
     """
-    df = df[df[category].str.contains(substring)]
+    if en:
+        df = df[df[category].str.contains(substring)]
     return df
 
 
@@ -229,6 +232,7 @@ def generate_settings(selection_index, title, bool_op_index, categories_index, f
     return settings
 
 
+
 def main():
     es = init()
 
@@ -263,7 +267,9 @@ def main():
         # TODO: sort, filter and display result
         ascending = bool(input("Ascending (True) or Descending (False) Order : "))  # False
         print('Categories: ', result.columns)
-        en = True
+
+        en = bool(input("Would you like Sorting, Filtering, & Substring Search [True] or not [False: "))  # False
+
         sorting_criteria_index = int(input("Enter Sorting Criteria Index : "))  # 0
         sorting_criteria = [categories[sorting_criteria_index]]
         sorted_data = sorting(df=result, en=en, sorting_criteria=sorting_criteria, ascending=ascending)
