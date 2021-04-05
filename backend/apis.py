@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, Response
 from flask_restful import Resource, Api
 import search_engine
 import json
@@ -39,6 +39,8 @@ def search():
     if body['needFilter'] == 1:
         results = search_engine.filtering(results, True, body['categories'])
 
+    feedback_list = ['Yes' for i in range(results.shape[0])] #default relevance feedback
+    results['RELEVANT'] = feedback_list
     result = {"data": results }
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
@@ -57,7 +59,14 @@ def sort():
 
     docs_json = json.loads(body['docs'])
     df = pd.DataFrame.from_dict(docs_json, orient="columns")
+
+    # removing feedback column from previous results
+    df.drop('RELEVANT', axis='columns', inplace=True)
+
     results = search_engine.sorting(df, True, body['sortBy'],body['isAscending'])
+
+    feedback_list = ['Yes' for i in range(results.shape[0])]  # default relevance feedback
+    results['RELEVANT'] = feedback_list
 
     result = {"data": results }
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
@@ -78,13 +87,27 @@ def filter():
     docs_json = json.loads(body['docs'])
     df = pd.DataFrame.from_dict(docs_json,orient="columns")
 
+    # removing feedback column from previous results
+    df.drop('RELEVANT',axis='columns', inplace=True)
+
     results = search_engine.filtering(df, True, body['categories'])
+
+    feedback_list = ['Yes' for i in range(results.shape[0])]  # default relevance feedback
+    results['RELEVANT'] = feedback_list
 
     result = {"data": results}
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
+@app.route("/feedback", methods=['POST'])
+def feedback():
+    body = request.get_json()
+    feedback_list = body['Results']
+    search_engine.evaluate(feedback_list)
+    return Response(status=200)
+
+
 if __name__ == '__main__':
     search_engine.main()
-    app.run(debug=True)
+    app.run(debug=True, use_reloader = False)
 
 

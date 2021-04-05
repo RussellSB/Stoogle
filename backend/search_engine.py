@@ -8,9 +8,14 @@ import pandas as pd
 import csv
 from elasticsearch import Elasticsearch, helpers
 import re as re
+from collections import Counter
+import math
 
 steamAppsIndex = 'steamapps'
 es = Elasticsearch()
+
+df_queries = pd.DataFrame(columns = ['query','q-precision','p@5','p@10','s-precision','DCG','hits','time-lag'])
+# pd.read_csv('df_queries.csv')
 
 def preprocess(steamtPath, tagsPath, descriptionPath, outputPath):
     print('preprocessing dataset...')
@@ -80,14 +85,19 @@ def indexSteamApps(es, datasetPath):
 
 def query(es, settings, total_docs):
     print('')
+
+    global df_queries
     print(settings)
     start = timer()
 
     result = es.search(index=steamAppsIndex, body={"query": settings}, size=total_docs)  # returns a dictionary
 
     print('')
-    print(f"Got {result['hits']['total']['value']} Hits in {timer() - start}s:")
-
+    time_lag =timer() - start
+    print(f"Got {result['hits']['total']['value']} Hits in {time_lag}s:")
+    df_queries = df_queries.append({'query': str(settings),'q-precision': 0,'p@5': 0,'p@10': 0,'s-precision': 0,'DCG': 0,
+                       'hits': result['hits']['total']['value'],'time-lag': time_lag},
+                      ignore_index=True)
     print('')
 
     # lists for data storage
@@ -232,7 +242,6 @@ def main():
     # index/update steamapps from csv file
     indexSteamApps(es, datasetPath)
 
-# Search function as called by APIs
 def search(searchTerm, boolOp, filterOp, categoryFilter, totalDocs):
     print('====NEW SEARCH =====')
     selection_index = 2
@@ -247,6 +256,44 @@ def search(searchTerm, boolOp, filterOp, categoryFilter, totalDocs):
                                      threshold)
 
     return query(es, settings, total_docs)
+
+def evaluate(feedback_list = []):
+    print('====EVALUATION =====')
+    global df_queries
+
+    # Query-specific precision
+    count_dict = Counter(feedback_list)
+    q_precision = count_dict['Yes']/len(feedback_list)
+    print('Q-precision:'+str(q_precision))
+    df_queries.iloc[-1, 1] = q_precision
+
+    # System-wide precision
+    s_precision = df_queries['q-precision'].sum()/df_queries.shape[0]
+    print('S-precision:' + str(s_precision))
+    df_queries.iloc[-1, 4] = s_precision
+
+    # Precision at cut-off
+    #cut-off = 5
+    count_dict_p5 = Counter(feedback_list[:5])
+    p_5 = count_dict_p5['Yes'] / 5
+    print('precision @ cutoff 5:' + str(p_5))
+    df_queries.iloc[-1, 2] = p_5
+
+    # cut-off = 10
+    count_dict_p10 = Counter(feedback_list[:10])
+    p_10 = count_dict_p10['Yes'] / 10
+    print('precision @ cutoff 10:' + str(p_10))
+    df_queries.iloc[-1, 3] = p_10
+
+    # Discounted Cumulative Gain
+    DCG = 0
+    p = len(feedback_list) # number of documents retrieved
+    feedback_list_int = [1 if f == 'Yes' else 0 for f in feedback_list]
+    for i in range(1, p):
+        DCG += (pow(2,feedback_list_int[i])-1)/(math.log(1+i))
+    df_queries.iloc[-1, 5] = DCG
+    print('DCG:' + str(DCG))
+    df_queries.to_csv(index=False)
 
 if __name__ == "__search_engine__":
     # execute only if run as a script
