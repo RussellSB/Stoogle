@@ -10,12 +10,14 @@ from elasticsearch import Elasticsearch, helpers
 import re as re
 from collections import Counter
 import math
+import os.path
+import matplotlib.pyplot as plt
 
 steamAppsIndex = 'steamapps'
 es = Elasticsearch()
 
-df_queries = pd.DataFrame(columns = ['query','q-precision','p@5','p@10','s-precision','DCG','hits','time-lag'])
-# pd.read_csv('df_queries.csv')
+column_headers = ['query','query-matching','q-precision','p@cutoff','s-precision','DCG','hits','time-lag']
+df_queries = pd.DataFrame(columns = column_headers)
 
 def preprocess(steamtPath, tagsPath, descriptionPath, outputPath):
     print('preprocessing dataset...')
@@ -86,7 +88,6 @@ def indexSteamApps(es, datasetPath):
 def query(es, settings, total_docs):
     print('')
 
-    global df_queries
     print(settings)
     start = timer()
 
@@ -95,9 +96,11 @@ def query(es, settings, total_docs):
     print('')
     time_lag =timer() - start
     print(f"Got {result['hits']['total']['value']} Hits in {time_lag}s:")
-    df_queries = df_queries.append({'query': str(settings),'q-precision': 0,'p@5': 0,'p@10': 0,'s-precision': 0,'DCG': 0,
-                       'hits': result['hits']['total']['value'],'time-lag': time_lag},
-                      ignore_index=True)
+
+    global df_queries
+    df_queries.iloc[-1, 6] = result['hits']['total']['value']
+    df_queries.iloc[-1, 7] = time_lag
+
     print('')
 
     # lists for data storage
@@ -157,6 +160,7 @@ def query(es, settings, total_docs):
             'TAGS': tags}  # store lists into a dictionary
     result = pd.DataFrame(dict)  # output dictionary as a dataframe and return the dataframe
 
+
     return result
 
 def sorting(df, en, sorting_criteria, ascending):
@@ -167,7 +171,6 @@ def sorting(df, en, sorting_criteria, ascending):
     :return: sorted dataframe
     """
 
-    print(sorting_criteria)
     if en:
         df = df.sort_values(by=sorting_criteria, ascending=ascending)
     return df
@@ -214,7 +217,6 @@ def generate_settings(selection_index, title, bool_op_index, categories_index, f
     filter_operation = ['lt', 'gt']
     categories = ['price', 'rating', 'owners']
 
-    print(type(selection_index))
     selection_index = selection_index % 3
 
     if selection_index == 0:
@@ -229,6 +231,14 @@ def generate_settings(selection_index, title, bool_op_index, categories_index, f
             categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
     else:
         print('No Instruction Found')
+
+
+    global df_queries
+    df_queries = df_queries.append(
+        {'query': str(settings), 'query-matching': selection_index, 'q-precision': 0, 'p@cutoff': 0, 's-precision': 0, 'DCG': 0,
+         'hits': 0, 'time-lag': 0},
+        ignore_index=True)
+
     return settings
 
 def main():
@@ -264,26 +274,24 @@ def evaluate(feedback_list = []):
     # Query-specific precision
     count_dict = Counter(feedback_list)
     q_precision = count_dict['Yes']/len(feedback_list)
+    q_precision = round(q_precision,2)
     print('Q-precision:'+str(q_precision))
-    df_queries.iloc[-1, 1] = q_precision
+    df_queries.iloc[-1, 2] = q_precision
 
     # System-wide precision
     s_precision = df_queries['q-precision'].sum()/df_queries.shape[0]
+    s_precision = round(s_precision,2)
     print('S-precision:' + str(s_precision))
-    df_queries.iloc[-1, 4] = s_precision
+    df_queries.iloc[-1, 4]  = s_precision
 
     # Precision at cut-off
-    #cut-off = 5
-    count_dict_p5 = Counter(feedback_list[:5])
-    p_5 = count_dict_p5['Yes'] / 5
-    print('precision @ cutoff 5:' + str(p_5))
-    df_queries.iloc[-1, 2] = p_5
-
-    # cut-off = 10
-    count_dict_p10 = Counter(feedback_list[:10])
-    p_10 = count_dict_p10['Yes'] / 10
-    print('precision @ cutoff 10:' + str(p_10))
-    df_queries.iloc[-1, 3] = p_10
+    p_cutoffs = []
+    for i in range(1,11):
+        count_dict_p_cutoff = Counter(feedback_list[:i])
+        p_cutoff = count_dict_p_cutoff['Yes'] / i
+        p_cutoffs.append(round(p_cutoff,2))
+        print('precision @ cutoff '+str(i)+': ' + str(p_cutoff))
+        df_queries.iloc[-1, 3] = str(p_cutoffs)
 
     # Discounted Cumulative Gain
     DCG = 0
@@ -291,9 +299,19 @@ def evaluate(feedback_list = []):
     feedback_list_int = [1 if f == 'Yes' else 0 for f in feedback_list]
     for i in range(1, p):
         DCG += (pow(2,feedback_list_int[i])-1)/(math.log(1+i))
+    DCG = round(DCG,2)
     df_queries.iloc[-1, 5] = DCG
     print('DCG:' + str(DCG))
-    df_queries.to_csv(index=False)
+
+    if os.path.exists('evaluation\df_queries.csv'):
+        df = pd.read_csv('evaluation\df_queries.csv')
+        df.append(df_queries.tail(1)) # Only append last row of df_queries
+        df_queries.tail(1).to_csv('evaluation\df_queries.csv', mode='a', header=False, index=False)
+    else:
+        df_queries.to_csv(r'evaluation\df_queries.csv', index=False)
+
+     #Add code to plot p@cutoff curves
+   
 
 if __name__ == "__search_engine__":
     # execute only if run as a script
