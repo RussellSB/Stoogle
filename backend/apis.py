@@ -108,6 +108,6 @@ def feedback():
 
 if __name__ == '__main__':
     search_engine.main()
-    app.run(debug=True, use_reloader = False)
+    app.run(debug=True, use_reloader = False, threaded= False)
 
 
