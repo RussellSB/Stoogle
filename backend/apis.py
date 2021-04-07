@@ -63,7 +63,8 @@ def sort():
     df = pd.DataFrame.from_dict(docs_json, orient="columns")
 
     # removing feedback column from previous results
-    df.drop('RELEVANT', axis='columns', inplace=True)
+    if 'RELEVANT' in df.keys():
+        df.drop('RELEVANT', axis='columns', inplace=True)
 
     results = search_engine.sorting(df, True, body['sortBy'],body['isAscending'])
 
@@ -90,7 +91,8 @@ def filter():
     df = pd.DataFrame.from_dict(docs_json,orient="columns")
 
     # removing feedback column from previous results
-    df.drop('RELEVANT',axis='columns', inplace=True)
+    if 'RELEVANT' in df.keys():
+        df.drop('RELEVANT',axis='columns', inplace=True)
 
     results = search_engine.filtering(df, True, body['categories'])
 
