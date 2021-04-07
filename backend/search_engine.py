@@ -87,79 +87,79 @@ def indexSteamApps(es, datasetPath):
 
 def query(es, settings, total_docs):
     print('')
-
     print(settings)
     start = timer()
 
-    result = es.search(index=steamAppsIndex, body={"query": settings}, size=total_docs)  # returns a dictionary
+    results = []
 
-    print('')
-    time_lag =timer() - start
-    print(f"Got {result['hits']['total']['value']} Hits in {time_lag}s:")
+    for setting in settings:
+        result = es.search(index=steamAppsIndex, body={"query": setting}, size=total_docs//3)  # returns a dictionary
 
-    global df_queries
-    df_queries.iloc[-1, 6] = result['hits']['total']['value']
-    df_queries.iloc[-1, 7] = time_lag
+        print('')
+        print(f"Got {result['hits']['total']['value']} Hits in {timer() - start}s:")
 
-    print('')
+        print('')
 
-    # lists for data storage
-    # text based
-    name = []
-    short_description = []
-    detailed_description = []
-    about_the_game = []
+        # lists for data storage
+        # text based
+        name = []
+        short_description = []
+        detailed_description = []
+        about_the_game = []
 
-    # numerics
-    price = []
-    rating = []
-    # appid = []
-    owners = []
+        # numerics
+        price = []
+        rating = []
+        # appid = []
+        owners = []
 
-    # tags
-    tags = []
+        # tags
+        tags = []
 
-    for hit in result['hits']['hits']:  # extract entries from a list
+        for hit in result['hits']['hits']:  # extract entries from a list
 
-        tag_temp = []
-        # print entries and add to the relevant lists declared above
-        # print(f'{hit["_source"]}')
-        name.append(hit["_source"]["name"])
-        price.append(float(hit["_source"]["price"]))
-        rating.append(float(hit["_source"]["rating"]))
-        # appid.append(float(hit["_source"]["appid"]))
-        owners.append(float(hit["_source"]["owners"]))
-        short_description.append(hit["_source"]["short_description"])
-        detailed_description.append(hit["_source"]["detailed_description"])
-        about_the_game.append((hit["_source"]["about_the_game"]))
+            tag_temp = []
+            # print entries and add to the relevant lists declared above
+            # print(f'{hit["_source"]}')
+            name.append(hit["_source"]["name"])
+            price.append(float(hit["_source"]["price"]))
+            rating.append(float(hit["_source"]["rating"]))
+            # appid.append(float(hit["_source"]["appid"]))
+            owners.append(float(hit["_source"]["owners"]))
+            short_description.append(hit["_source"]["short_description"])
+            detailed_description.append(hit["_source"]["detailed_description"])
+            about_the_game.append((hit["_source"]["about_the_game"]))
 
-        # get tags and put them into a string
-        if (hit["_source"]["action"]) == 'True':
-            tag_temp.append('action')
-        if (hit["_source"]["indie"]) == 'True':
-            tag_temp.append('indie')
-        if (hit["_source"]["adventure"]) == 'True':
-            tag_temp.append('adventure')
-        if (hit["_source"]["multiplayer"]) == 'True':
-            tag_temp.append('multiplayer')
-        if (hit["_source"]["singleplayer"]) == 'True':
-            tag_temp.append('singleplayer')
-        if (hit["_source"]["casual"]) == 'True':
-            tag_temp.append('casual')
-        if (hit["_source"]["rpg"]) == 'True':
-            tag_temp.append('rpg')
-        if (hit["_source"]["strategy"]) == 'True':
-            tag_temp.append('strategy')
-        if (hit["_source"]["open_world"]) == 'True':
-            tag_temp.append('open_world')
-        if (hit["_source"]["simulation"]) == 'True':
-            tag_temp.append('simulation')
-        tags.append(' '.join([str(item) for item in tag_temp]))
+            # get tags and put them into a string
+            if (hit["_source"]["action"]) == 'True':
+                tag_temp.append('action')
+            if (hit["_source"]["indie"]) == 'True':
+                tag_temp.append('indie')
+            if (hit["_source"]["adventure"]) == 'True':
+                tag_temp.append('adventure')
+            if (hit["_source"]["multiplayer"]) == 'True':
+                tag_temp.append('multiplayer')
+            if (hit["_source"]["singleplayer"]) == 'True':
+                tag_temp.append('singleplayer')
+            if (hit["_source"]["casual"]) == 'True':
+                tag_temp.append('casual')
+            if (hit["_source"]["rpg"]) == 'True':
+                tag_temp.append('rpg')
+            if (hit["_source"]["strategy"]) == 'True':
+                tag_temp.append('strategy')
+            if (hit["_source"]["open_world"]) == 'True':
+                tag_temp.append('open_world')
+            if (hit["_source"]["simulation"]) == 'True':
+                tag_temp.append('simulation')
+            tags.append(' '.join([str(item) for item in tag_temp]))
 
-    dict = {'NAME': name, 'PRICE': price, 'RATING': rating, 'SHORT_DESCRIPTION': short_description, 'OWNERS': owners,
-            'TAGS': tags}  # store lists into a dictionary
-    result = pd.DataFrame(dict)  # output dictionary as a dataframe and return the dataframe
+        dict = {'NAME': name, 'PRICE': price, 'RATING': rating, 'SHORT_DESCRIPTION': short_description, 'OWNERS': owners,
+                'TAGS': tags}  # store lists into a dictionary
+        result = pd.DataFrame(dict)  # output dictionary as a dataframe and return the dataframe
+        results.append(result)
 
+    result = pd.concat(results, ignore_index=True) # put all dataframes together
+    result = result.drop_duplicates() # get rid of all duplicates
 
     return result
 
@@ -222,18 +222,31 @@ def generate_settings(selection_index, title, bool_op_index, categories_index, f
 
     if selection_index == 0:
         # print('MATCH: ', title)
-        settings = {"match": {'name': title}}  # match operator
+        settings0 = {"match": {'name': title}}  # match operator
+        settings1 = {"match": {'tags': title}}
+        settings2 = {"match": {'short_description': title}}
     elif selection_index == 1:
         # print('BOOL: ', bool_op[bool_op_index], title)
-        settings = {'bool': {bool_op[bool_op_index]: [{'match': {'name': title}}]}}  # bool must operator
+        settings0 = {'bool': {bool_op[bool_op_index]: [{'match': {'name': title}}]}}  # bool must operator
+        settings1 = {'bool': {bool_op[bool_op_index]: [{'match': {'tags': title}}]}}  # bool must operator
+        settings2 = {'bool': {bool_op[bool_op_index]: [{'match': {'short_description': title}}]}}  # bool must operator
+
     elif selection_index == 2:
         # print('BOOL: ', bool_op[bool_op_index], title, categories[categories_index], filter_operation[filter_operation_index], threshold)
-        settings = {'bool': {bool_op[bool_op_index]: {'match': {'name': title}}, "filter": {"range": {
+        settings0 = {'bool': {bool_op[bool_op_index]: {'match': {'name': title}}, "filter": {"range": {
+            categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
+        settings1 = {'bool': {bool_op[bool_op_index]: {'match': {'tags': title}}, "filter": {"range": {
+            categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
+        settings2 = {'bool': {bool_op[bool_op_index]: {'match': {'short_description': title}}, "filter": {"range": {
             categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
     else:
+        settings = None
         print('No Instruction Found')
 
+    settings = [settings0, settings1, settings2]
 
+    
+    # check this - settings is no longer a single output but a list of outputs
     global df_queries
     df_queries = df_queries.append(
         {'query': str(settings), 'query-matching': selection_index, 'q-precision': 0, 'p@cutoff': 0, 's-precision': 0, 'DCG': 0,
