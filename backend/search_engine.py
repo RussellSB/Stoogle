@@ -185,7 +185,7 @@ def filtering(df, en, items):
         df = df.filter(items=items)
     return df
 
-def substring_search(df, en, category, substring):
+def tag_filter(df, en, tags=[]):
     """
     :param df: input data frame
     :param category: the column you would like to search a string for
@@ -193,7 +193,8 @@ def substring_search(df, en, category, substring):
     :return: dataframe with entries containing specified string in specified column
     """
     if en:
-        df = df[df[category].str.contains(substring)]
+        for tag in tags:
+          df = df[df['TAGS'].str.contains(tag)]
     return df
 
 def print_the_data(result, sorted_data, filtered_data, data_with_string):
