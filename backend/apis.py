@@ -11,7 +11,7 @@ api = Api(app)
 def start():
     return "Server running.."
 
-@app.route("/search", methods=['GET'])
+@app.route("/search", methods=['POST'])
 def search():
     body = request.get_json()
     print('Search input:')
@@ -46,7 +46,7 @@ def search():
     result = {"data": results }
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
-@app.route("/sort", methods=['GET'])
+@app.route("/sort", methods=['POST'])
 def sort():
     body = request.get_json()
     print('Sort input:')
@@ -74,7 +74,7 @@ def sort():
     result = {"data": results }
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
-@app.route("/filter", methods=['GET'])
+@app.route("/filter", methods=['POST'])
 def filter():
     body = request.get_json()
     print('Filter input:')
@@ -102,7 +102,7 @@ def filter():
     result = {"data": results}
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
-@app.route("/tagFilter", methods=['GET'])
+@app.route("/tagFilter", methods=['POST'])
 def tag_filter():
     body = request.get_json()
     print('Filter input:')
