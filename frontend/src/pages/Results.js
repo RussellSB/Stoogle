@@ -8,22 +8,12 @@ import ItemList from '../components/ItemList'
 
 import {useState} from 'react'
 
-// TODO: make with respect to data from backend
-const data = [];
-for(let i=0; i<50; i++){
-    data.push({
-        id: i,
-        title: 'Ant Design Title '+ i,
-        description: 'Ant Design, a design language for background applications, is refined by Ant UED Team. ',
-        price: '20.00'
-    })
-}
-
 const Results = (props) => {
 
-    const [checked, setChecked] = useState(data.length)
+    const [checked, setChecked] = useState(props.results.length)  // sets to amount of checked to amount returned
 
     const onSave = () => {
+        console.log(checked)
         console.log(checked)
     }
     
@@ -52,7 +42,7 @@ const Results = (props) => {
         <div className='bot'>
 
             <div className='results'>
-                <ItemList onCheck={onCheck} data={data}/>
+                <ItemList onCheck={onCheck} data={props.results}/>
             </div>
 
             <div className='subBot'>

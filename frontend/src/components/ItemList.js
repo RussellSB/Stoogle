@@ -21,11 +21,11 @@ const ItemList = (props) => {
 
     // If pressed key is our target key then perform action to navigate left or right
     const upHandler = ({ key }) => {
-      if (key === 'ArrowLeft' && value.current - 1 >= 1) {  //doesnt trigger when outside limit
+      if (key === 'ArrowLeft' && value.current - 1 >= 1) {  // doesn't trigger when outside limit
         value.current -= 1
         setPageIndex(value.current)
       }
-      if (key === 'ArrowRight' && value.current + 1 <= Math.ceil(props.data.length / PAGE_SIZE)) {  //doesnt trigger when outside limit
+      if (key === 'ArrowRight' && value.current + 1 <= Math.ceil(props.data.length / PAGE_SIZE)) {  //doesn't trigger when outside limit
         value.current += 1
         setPageIndex(value.current)
       }
@@ -40,7 +40,7 @@ const ItemList = (props) => {
       };
     }, []); // Empty array ensures that effect is only run on mount and unmount
 
-    // A hacky solution, to enable all by default
+    // A hacky solution, to enable all check marks by default
     const defaultChecked = [];
     for(let i=0; i<props.data.length; i++){
         defaultChecked.push(i)
@@ -66,7 +66,7 @@ const ItemList = (props) => {
                     title={item.title}
                     description={item.description}
                     />
-                    <div style={{paddingRight: 20}}>£{item.price}</div>
+                    <div style={{paddingRight: 40, paddingLeft: 20}}>£{item.price}</div>
                     <Checkbox value={item.id} onChange={props.onCheck}/>
                 </List.Item>
             </Checkbox.Group>
