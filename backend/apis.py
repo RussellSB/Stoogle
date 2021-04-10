@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request, render_template, Response
 from flask_restful import Resource, Api
+from flask_cors import CORS, cross_origin
+
 import search_engine
 import json
 import pandas as pd
@@ -12,6 +14,7 @@ def start():
     return "Server running.."
 
 @app.route("/search", methods=['POST'])
+@cross_origin()
 def search():
     body = request.get_json()
     print('Search input:')
@@ -47,6 +50,7 @@ def search():
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
 @app.route("/sort", methods=['POST'])
+@cross_origin()
 def sort():
     body = request.get_json()
     print('Sort input:')
@@ -75,6 +79,7 @@ def sort():
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
 @app.route("/filter", methods=['POST'])
+@cross_origin()
 def filter():
     body = request.get_json()
     print('Filter input:')
@@ -103,6 +108,7 @@ def filter():
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
 @app.route("/tagFilter", methods=['POST'])
+@cross_origin()
 def tag_filter():
     body = request.get_json()
     print('Filter input:')
@@ -129,6 +135,7 @@ def tag_filter():
     return json.dumps(result, default=lambda results: json.loads(results.to_json()))
 
 @app.route("/feedback", methods=['POST'])
+@cross_origin()
 def feedback():
     body = request.get_json()
     feedback_list = body['Results']
