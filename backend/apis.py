@@ -39,6 +39,8 @@ def search():
 
     search_engine.tag_filter(results,True,[])
 
+    print(len(results))
+
     if body['needSort'] == 1:
         results = search_engine.sorting(results, True, body['sortBy'], bool(body['isAscending']))
 

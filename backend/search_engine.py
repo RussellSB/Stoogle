@@ -92,11 +92,16 @@ def query(es, settings, total_docs):
 
     results = []
 
+    total_hits = 0
+    total_time = 0
+
     for setting in settings:
         result = es.search(index=steamAppsIndex, body={"query": setting}, size=total_docs//3)  # returns a dictionary
 
         print('')
         print(f"Got {result['hits']['total']['value']} Hits in {timer() - start}s:")
+        total_hits += result['hits']['total']['value']
+        total_time += (timer() - start)
 
         print('')
 
@@ -158,6 +163,9 @@ def query(es, settings, total_docs):
         result = pd.DataFrame(dict)  # output dictionary as a dataframe and return the dataframe
         results.append(result)
 
+    global df_queries
+    df_queries.iloc[-1, 6] = total_hits
+    df_queries.iloc[-1, 7] = total_time
     result = pd.concat(results, ignore_index=True) # put all dataframes together
     result = result.drop_duplicates() # get rid of all duplicates
 
