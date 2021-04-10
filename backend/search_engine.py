@@ -266,14 +266,14 @@ def main():
     # index/update steamapps from csv file
     indexSteamApps(es, datasetPath)
 
-def search(searchTerm, boolOp, filterOp, categoryFilter, totalDocs):
+def search(searchTerm, boolOp, filterOp, categoryThreshold, categoryFilter, totalDocs):
     print('====NEW SEARCH =====')
     selection_index = 2
     title = searchTerm
     bool_op_index = boolOp
     categories_index = categoryFilter
     filter_operation_index = filterOp
-    threshold = 3
+    threshold = categoryThreshold
     total_docs = totalDocs
 
     settings = generate_settings(selection_index, title, bool_op_index, categories_index, filter_operation_index,

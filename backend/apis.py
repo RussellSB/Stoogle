@@ -25,6 +25,7 @@ def search():
     #     "searchTerm": "Counter-Strike",
     #     "boolOp" : 0,  # index of the list-item ['must', 'should', 'match']
     #     "filterOp" : 0,  # 0 for 'lt', 1 for 'gt'
+    #      "categoryThreshold" : 3,
     #     "categoryFilter": 0, #index of the list-item ['price', 'rating', 'owners']
     #     "totalDocs": 10,
     #     "needSort" : 1,    #if sorting is needed, needSort =1 else needSort = 0
@@ -34,7 +35,7 @@ def search():
     #     "categories": ['NAME', 'PRICE', 'RATING', 'SHORT_DESCRIPTION', 'OWNERS', 'TAGS'] # required only if needFilter = 1
     # }
 
-    results = search_engine.search(body['searchTerm'], body['boolOp'], body['filterOp'], body['categoryFilter'], body['totalDocs'])
+    results = search_engine.search(body['searchTerm'], body['boolOp'], body['filterOp'], body['categoryThreshold'], body['categoryFilter'], body['totalDocs'])
 
     search_engine.tag_filter(results,True,[])
 
