@@ -14,20 +14,21 @@ const App = () => {
 
    const [results, setResults] = useState([])  // stores the retrieved data parsed correctly
   	
-   const onSearch = async () => {    
+   // Searches for results from API - linked to backend
+   const onSearch = () => {    
       //let payload = {search, sortBy, maxPrice: 1000, tags}
 
       const payload = {
          "searchTerm": search,
-         "boolOp": 0,  
+         "boolOp": 1,  
          "filterOp": 0,  
          "categoryFilter": 0, 
          "categoryThreshold": 50,
-         "totalDocs": 10,
-         "needSort": 1,  
+         "totalDocs": 11,
+         "needSort": 0,  
          "sortBy": ["NAME"], 
          "isAscending": 1, 
-         "needFilter": 1, 
+         "needFilter": 0, 
          "categories": ["NAME", "PRICE", "RATING", "SHORT_DESCRIPTION"],
       }
       
@@ -45,10 +46,8 @@ const App = () => {
      fetch('http://localhost:5000/search', requestOptions)
          .then(response => response.json())
          .then(data => {
-
             console.log(data)
             const d = []  // list to store objects of information
-            const length = Object.keys(data.data['NAME']).length  // sets to length of results returned
         
             let i = 0
             for (const [key, value] of Object.entries(data.data['NAME']))
@@ -57,15 +56,20 @@ const App = () => {
                      id: i,
                      title: data.data['NAME'][key],
                      description: data.data['SHORT_DESCRIPTION'][key],
-                     price: data.data['PRICE'][key],
-                     checked: data.data['RELEVANT'][key]
+                     price: data.data['PRICE'][key]
                   })
+
                   i += 1
             }
 
             setResults(d)
             setPage('results')
          })
+   }
+
+   // Parses checked marks annotations and sends relevancy feedback to server for evaluation
+   const onFeedback = async () => {
+
    }
 
   return (

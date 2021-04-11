@@ -11,7 +11,7 @@ const MaxPrice = (props) => {
     }
 
     return (
-        <Button type="primary" size='large' onClick={props.onSave} style={saveStyle}>Save Relevancy</Button>
+        <Button type="primary" size='large' onClick={props.onSave} style={saveStyle}>Send Relevancy</Button>
     );
 }
 

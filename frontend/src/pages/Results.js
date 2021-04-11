@@ -6,24 +6,29 @@ import MaxPrice from '../components/MaxPrice'
 import Save from '../components/Save'
 import ItemList from '../components/ItemList'
 
-import {useState} from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const Results = (props) => {
 
-    const [checked, setChecked] = useState(props.results.length)  // sets to amount of checked to amount returned
+    // ================= Concerned with pagination
+    const value = useRef(1);
+    const [pageIndex, setPageIndex] = useState(value.current)
+    const [checklist, setCheckList] = useState([])
 
     const onSave = () => {
-        console.log(checked)
-        console.log(checked)
+        console.log('todo', checklist)
     }
-    
-    const onCheck = (e) => {
-        if(e.target.checked){
-            setChecked(checked + 1)
-        }
-        else{
-            setChecked(checked - 1)
-        }
+
+    // Wrapper for onSearch in order to reset page and check marks
+    const onSearch = () => {
+        // On search reset to first page
+        value.current = 1;
+        setPageIndex(value.current)
+
+        // Reset checklist since its a new search
+        setCheckList([])
+
+        props.onSearch()
     }
 
     return (
@@ -33,7 +38,7 @@ const Results = (props) => {
 	    	<div className='titleSmall'>St<span className='oo'>oo</span>gle</div>
 	    	<SearchBar 
                 setSearch={props.setSearch} 
-                onSearch={props.onSearch} 
+                onSearch={onSearch} 
                 search={props.search} 
                 width={800}
             />
@@ -42,7 +47,15 @@ const Results = (props) => {
         <div className='bot'>
 
             <div className='results'>
-                <ItemList onCheck={onCheck} data={props.results}/>
+                <ItemList 
+                    onCheck={props.onCheck} 
+                    data={props.results}
+                    value = {value}
+                    pageIndex={pageIndex}
+                    setPageIndex={setPageIndex}
+                    checklist={checklist}
+                    setCheckList={setCheckList}
+                    />
             </div>
 
             <div className='subBot'>
@@ -81,7 +94,7 @@ const Results = (props) => {
                 </div>
 
                 <div className='subBotContainerR'>
-                    <p>Save</p>
+                    <p>Send</p>
                     <div className='saveR'>
                         <Save onSave={onSave} width={280}/>
                     </div>
