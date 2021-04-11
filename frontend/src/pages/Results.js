@@ -15,6 +15,8 @@ const Results = (props) => {
     const [pageIndex, setPageIndex] = useState(value.current)
     const [checklist, setCheckList] = useState([])
 
+    const [block, setBlock] = useState(true)
+
     // Resets page index and checklist on new results
     useEffect(() => {
 
@@ -29,8 +31,12 @@ const Results = (props) => {
         }
         setCheckList(defaultCheckList)
 
+        // Toggle visibility
+        if(props.sortBy == 'relevancy'){setBlock(false)}
+        else{setBlock(true)}
+
         return () => {};
-      }, [props.results]);
+      }, [props.results, props.sortBy]);
 
     return (
     <div className='bodyResults'>
@@ -99,7 +105,7 @@ const Results = (props) => {
                 <div className='subBotContainerR'>
                     <p>Send</p>
                     <div className='saveR'>
-                        <Save onSave={() => props.sendFeedback(checklist)} width={280}/>
+                        <Save onSave={() => props.sendFeedback(checklist)} width={280} block={block}/>
                     </div>
                 </div>
                 

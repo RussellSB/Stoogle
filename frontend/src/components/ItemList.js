@@ -21,7 +21,7 @@ const ItemList = (props) => {
         props.value.current -= 1
         props.setPageIndex(props.value.current)
       }
-      if (key === 'ArrowRight' && props.value.current + 1 <= Math.ceil(props.data.length / PAGE_SIZE)) {  //doesn't trigger when outside limit
+      if (key === 'ArrowRight' && props.value.current <= Math.ceil(props.data.length / PAGE_SIZE)) {  //doesn't trigger when outside limit
         props.value.current += 1
         props.setPageIndex(props.value.current)
       }

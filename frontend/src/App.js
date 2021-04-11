@@ -18,18 +18,19 @@ const App = () => {
    const onSearch = () => {    
       //let payload = {search, sortBy, maxPrice: 1000, tags}
 
+
+
       const payload = {
          "searchTerm": search,
-         "boolOp": 1,  
-         "filterOp": 0,  
-         "categoryFilter": 0, 
-         "categoryThreshold": 10,
+         "boolOp": 1,  // index of the list-item ['must', 'should', 'match']
+         "filterOp": 0,  // 0 for less than, return items less than max price
+         "categoryFilter": 0, // index of the list-item ['price', 'rating', 'owners']
+         "categoryThreshold": maxPrice,  // effectively MaxPrice
          "totalDocs": 20,
-         "needSort": 0,  
-         "sortBy": ["NAME"], 
+         "needSort": 0,  // Set to 0 for Relevancy, 1 for rest
+         "sortBy": ["NAME"], // either Rating or Owners
          "isAscending": 1, 
-         "needFilter": 0, 
-         "categories": ["NAME", "PRICE", "RATING", "SHORT_DESCRIPTION"],
+         "needFilter": 0  // set to false
       }
       
       //console.log(payload)
