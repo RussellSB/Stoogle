@@ -220,33 +220,34 @@ def print_the_data(result, sorted_data, filtered_data, data_with_string):
     print('=================')
     print(data_with_string)
 
-def generate_settings(selection_index, title, bool_op_index, categories_index, filter_operation_index, threshold):
+def generate_settings(selection_index, text, bool_op_index, categories_index, filter_operation_index, threshold):
     # test query
     bool_op = ['must', 'should', 'match']
-    filter_operation = ['lt', 'gt']
+    filter_operation = ['lte', 'gt']
     categories = ['price', 'rating', 'owners']
 
     selection_index = selection_index % 3
 
     if selection_index == 0:
         # print('MATCH: ', title)
-        settings0 = {"match": {'name': title}}  # match operator
-        settings1 = {"match": {'tags': title}}
-        settings2 = {"match": {'short_description': title}}
+        settings0 = {"match": {'name': text}}  # match operator
+        settings1 = {"match": {'tags': text}}
+        settings2 = {"match": {'short_description': text}}
     elif selection_index == 1:
         # print('BOOL: ', bool_op[bool_op_index], title)
-        settings0 = {'bool': {bool_op[bool_op_index]: [{'match': {'name': title}}]}}  # bool must operator
-        settings1 = {'bool': {bool_op[bool_op_index]: [{'match': {'tags': title}}]}}  # bool must operator
-        settings2 = {'bool': {bool_op[bool_op_index]: [{'match': {'short_description': title}}]}}  # bool must operator
+        settings0 = {'bool': {bool_op[bool_op_index]: [{'match': {'name': text}}]}}  # bool must operator
+        settings1 = {'bool': {bool_op[bool_op_index]: [{'match': {'tags': text}}]}}  # bool must operator
+        settings2 = {'bool': {bool_op[bool_op_index]: [{'match': {'short_description': text}}]}}  # bool must operator
 
     elif selection_index == 2:
-        # print('BOOL: ', bool_op[bool_op_index], title, categories[categories_index], filter_operation[filter_operation_index], threshold)
-        settings0 = {'bool': {bool_op[bool_op_index]: {'match': {'name': title}}, "filter": {"range": {
+        print('BOOL: ', bool_op[bool_op_index], text, categories[categories_index], filter_operation[filter_operation_index], threshold)
+        settings0 = {'bool': {bool_op[bool_op_index]: {'match': {'name': text}}, "filter": {"range": {
             categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
-        settings1 = {'bool': {bool_op[bool_op_index]: {'match': {'tags': title}}, "filter": {"range": {
+        settings1 = {'bool': {bool_op[bool_op_index]: {'match': {'tags': text}}, "filter": {"range": {
             categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
-        settings2 = {'bool': {bool_op[bool_op_index]: {'match': {'short_description': title}}, "filter": {"range": {
+        settings2 = {'bool': {bool_op[bool_op_index]: {'match': {'short_description': text}}, "filter": {"range": {
             categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
+
     else:
         settings = None
         print('No Instruction Found')

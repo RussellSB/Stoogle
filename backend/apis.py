@@ -32,20 +32,22 @@ def search():
     #     "sortBy": ["PRICE"],       # required only if needSort = 1 ['PRICE', 'RATING', 'OWNERS']
     #     "isAscending":1,    # required only if needSort = 1
     #     "needFilter" : 1, #if filting is needed, needFilter =1 else needFilter = 0
-    #     "categories": ['NAME', 'PRICE', 'RATING', 'SHORT_DESCRIPTION', 'OWNERS', 'TAGS'] # required only if needFilter = 1
+    #     "categories": ['NAME', 'PRICE', 'RATING', 'SHORT_DESCRIPTION', 'OWNERS', 'TAGS'], # required only if needFilter = 1
+    #     "tags": ["action"]
     # }
 
     results = search_engine.search(body['searchTerm'], body['boolOp'], body['filterOp'], body['categoryThreshold'], body['categoryFilter'], body['totalDocs'])
 
     search_engine.tag_filter(results,True,[])
 
-    print(len(results))
-
     if body['needSort'] == 1:
         results = search_engine.sorting(results, True, body['sortBy'], bool(body['isAscending']))
 
     if body['needFilter'] == 1:
         results = search_engine.filtering(results, True, body['categories'])
+
+    if len(body["tags"]) > 0:
+        results = search_engine.tag_filter(results, True, body['tags'])
 
     feedback_list = ['Yes' for i in range(results.shape[0])] #default relevance feedback
     results['RELEVANT'] = feedback_list
