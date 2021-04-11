@@ -13,18 +13,40 @@ const App = () => {
    const [page, setPage] = useState('onboarding') // onboarding
 
    const [results, setResults] = useState([])  // stores the retrieved data parsed correctly
+
+   // Updates results with retrieved data
+   const updateResults = (data) => {
+      console.log(data)
+      const d = []  // list to store objects of information
+   
+      let i = 0
+      for (const [key, value] of Object.entries(data.data['NAME']))
+      {
+            d.push({
+               id: i,
+               title: data.data['NAME'][key],
+               description: data.data['SHORT_DESCRIPTION'][key],
+               price: data.data['PRICE'][key]
+            })
+
+            i += 1
+      }
+
+      setResults(d)
+      setPage('results')
+   }
   	
    // Searches for results from API - linked to backend
    const onSearch = () => {    
-      //let payload = {search, sortBy, maxPrice: 1000, tags}
 
+      // Handles sort by
       let needSort = 0
       if (sortBy != 'relevancy'){needSort = 1}
 
       const payload = {
          "searchTerm": search,
          "boolOp": 1,  // index of the list-item ['must', 'should', 'match']
-         "filterOp": 0,  // 0 for less than, return items less than max price
+         "filterOp": 0,  // 0 for less than, return items less than categoryThreshold
          "categoryFilter": 0, // index of the list-item ['price', 'rating', 'owners']
          "categoryThreshold": maxPrice,  // effectively MaxPrice
          "totalDocs": 20,
@@ -33,39 +55,39 @@ const App = () => {
          "isAscending": 1, 
          "needFilter": 0  // set to false
       }
-      
-      //console.log(payload)
 
       const requestOptions = {
          method: 'POST',
          headers: { 
             'Content-Type': 'application/json', 
             'Access-Control-Allow-Origin': '*',
-       },
+         },
          body: JSON.stringify(payload)
-     }
+      }
 
      fetch('http://localhost:5000/search', requestOptions)
          .then(response => response.json())
          .then(data => {
-            console.log(data)
-            const d = []  // list to store objects of information
-        
-            let i = 0
-            for (const [key, value] of Object.entries(data.data['NAME']))
+
+            // Does an API call to filter further for tags if necessary
+            if(tags.length > 0)
             {
-                  d.push({
-                     id: i,
-                     title: data.data['NAME'][key],
-                     description: data.data['SHORT_DESCRIPTION'][key],
-                     price: data.data['PRICE'][key]
-                  })
+               const tagRequestOptions = {
+                  method: 'POST',
+                  headers: { 
+                     'Content-Type': 'application/json', 
+                     'Access-Control-Allow-Origin': '*',
+                  },
+                  body: JSON.stringify({'docs': JSON.stringify(data), 'tags': tags})
+               }
 
-                  i += 1
+               fetch('http://localhost:5000/tagFilter', tagRequestOptions)
+                  .then(response => response.json())
+                  .then(data_tag_filtered => {updateResults(data_tag_filtered)})
+         
             }
-
-            setResults(d)
-            setPage('results')
+            else{updateResults(data)}
+            
          })
    }
 
