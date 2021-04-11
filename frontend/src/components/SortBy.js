@@ -19,8 +19,9 @@ const SortBy = (props) => {
         >
             
             <Option value="relevancy">Relevancy</Option>
-            <Option value="reviews">Reviews</Option>
-            <Option value="popularity">Popularity</Option>
+            <Option value="RATING">Reviews</Option>
+            <Option value="OWNERS">Popularity</Option>
+            <Option value="PRICE">Price</Option>
         </Select>
     );
 }

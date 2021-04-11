@@ -18,7 +18,8 @@ const App = () => {
    const onSearch = () => {    
       //let payload = {search, sortBy, maxPrice: 1000, tags}
 
-
+      let needSort = 0
+      if (sortBy != 'relevancy'){needSort = 1}
 
       const payload = {
          "searchTerm": search,
@@ -27,8 +28,8 @@ const App = () => {
          "categoryFilter": 0, // index of the list-item ['price', 'rating', 'owners']
          "categoryThreshold": maxPrice,  // effectively MaxPrice
          "totalDocs": 20,
-         "needSort": 0,  // Set to 0 for Relevancy, 1 for rest
-         "sortBy": ["NAME"], // either Rating or Owners
+         "needSort": needSort,  // Set to 0 for Relevancy, 1 for rest
+         "sortBy": [sortBy], // either Rating or Owners
          "isAscending": 1, 
          "needFilter": 0  // set to false
       }
