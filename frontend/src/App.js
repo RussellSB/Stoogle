@@ -13,28 +13,6 @@ const App = () => {
    const [page, setPage] = useState('onboarding') // onboarding
 
    const [results, setResults] = useState([])  // stores the retrieved data parsed correctly
-
-   // Updates results with retrieved data
-   const updateResults = (data) => {
-      console.log(data)
-      const d = []  // list to store objects of information
-   
-      let i = 0
-      for (const [key, value] of Object.entries(data.data['NAME']))
-      {
-            d.push({
-               id: i,
-               title: data.data['NAME'][key],
-               description: data.data['SHORT_DESCRIPTION'][key],
-               price: data.data['PRICE'][key]
-            })
-
-            i += 1
-      }
-
-      setResults(d)
-      setPage('results')
-   }
   	
    // Searches for results from API - linked to backend
    const onSearch = () => {    
@@ -53,7 +31,8 @@ const App = () => {
          "needSort": needSort,  // Set to 0 for Relevancy, 1 for rest
          "sortBy": [sortBy], // either Rating or Owners
          "isAscending": 1, 
-         "needFilter": 0  // set to false
+         "needFilter": 0,  // set to false
+         "tags": tags
       }
 
       const requestOptions = {
@@ -69,24 +48,24 @@ const App = () => {
          .then(response => response.json())
          .then(data => {
 
-            // Does an API call to filter further for tags if necessary
-            if(tags.length > 0)
-            {
-               const tagRequestOptions = {
-                  method: 'POST',
-                  headers: { 
-                     'Content-Type': 'application/json', 
-                     'Access-Control-Allow-Origin': '*',
-                  },
-                  body: JSON.stringify({'docs': JSON.stringify(data), 'tags': tags})
-               }
-
-               fetch('http://localhost:5000/tagFilter', tagRequestOptions)
-                  .then(response => response.json())
-                  .then(data_tag_filtered => {updateResults(data_tag_filtered)})
+            console.log(data)
+            const d = []  // list to store objects of information
          
+            let i = 0
+            for (const [key, value] of Object.entries(data.data['NAME']))
+            {
+                  d.push({
+                     id: i,
+                     title: data.data['NAME'][key],
+                     description: data.data['SHORT_DESCRIPTION'][key],
+                     price: data.data['PRICE'][key]
+                  })
+
+                  i += 1
             }
-            else{updateResults(data)}
+
+            setResults(d)
+            setPage('results')
             
          })
    }
