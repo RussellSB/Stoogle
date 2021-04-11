@@ -15,21 +15,22 @@ const Results = (props) => {
     const [pageIndex, setPageIndex] = useState(value.current)
     const [checklist, setCheckList] = useState([])
 
-    const onSave = () => {
-        console.log('todo', checklist)
-    }
+    // Resets page index and checklist on new results
+    useEffect(() => {
 
-    // Wrapper for onSearch in order to reset page and check marks
-    const onSearch = () => {
-        // On search reset to first page
+        // Reset page to first
         value.current = 1;
-        setPageIndex(value.current)
+        setPageIndex(value.current)  
 
-        // Reset checklist since its a new search
-        setCheckList([])
+        // Reset checkboxes to all relevant
+        const defaultCheckList = []
+        for (let i=0; i < props.results.length; i++){
+            defaultCheckList.push(i)
+        }
+        setCheckList(defaultCheckList)
 
-        props.onSearch()
-    }
+        return () => {};
+      }, [props.results]);
 
     return (
     <div className='bodyResults'>
@@ -38,7 +39,7 @@ const Results = (props) => {
 	    	<div className='titleSmall'>St<span className='oo'>oo</span>gle</div>
 	    	<SearchBar 
                 setSearch={props.setSearch} 
-                onSearch={onSearch} 
+                onSearch={props.onSearch} 
                 search={props.search} 
                 width={800}
             />
@@ -51,8 +52,10 @@ const Results = (props) => {
                     onCheck={props.onCheck} 
                     data={props.results}
                     value = {value}
+
                     pageIndex={pageIndex}
                     setPageIndex={setPageIndex}
+
                     checklist={checklist}
                     setCheckList={setCheckList}
                     />
@@ -96,7 +99,7 @@ const Results = (props) => {
                 <div className='subBotContainerR'>
                     <p>Send</p>
                     <div className='saveR'>
-                        <Save onSave={onSave} width={280}/>
+                        <Save onSave={() => props.sendFeedback(checklist)} width={280}/>
                     </div>
                 </div>
                 

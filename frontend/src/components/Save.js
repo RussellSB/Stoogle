@@ -1,6 +1,3 @@
-import { Input } from 'antd';
-
-import { Slider, Switch } from 'antd';
 import { Button } from 'antd';
 
 const MaxPrice = (props) => {

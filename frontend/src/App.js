@@ -23,8 +23,8 @@ const App = () => {
          "boolOp": 1,  
          "filterOp": 0,  
          "categoryFilter": 0, 
-         "categoryThreshold": 50,
-         "totalDocs": 11,
+         "categoryThreshold": 10,
+         "totalDocs": 20,
          "needSort": 0,  
          "sortBy": ["NAME"], 
          "isAscending": 1, 
@@ -68,8 +68,36 @@ const App = () => {
    }
 
    // Parses checked marks annotations and sends relevancy feedback to server for evaluation
-   const onFeedback = async () => {
+   const sendFeedback = (checklist) => {
 
+      const sortedCheckList = checklist.sort()
+      const feedback = [] // feedback is a list of 'yes' and 'no' wrt to relevant item index
+
+      for (let i=0; i<results.length; i++){
+         if (sortedCheckList.includes(i))
+         {
+            feedback.push('Yes')
+         }
+         else
+         {
+            feedback.push('No')
+         }
+      }
+
+      // Send to API
+      const payload = {"Results":feedback}
+
+      const requestOptions = {
+         method: 'POST',
+         headers: { 
+            'Content-Type': 'application/json', 
+            'Access-Control-Allow-Origin': '*',
+         },
+         body: JSON.stringify(payload)
+      }
+
+      fetch('http://localhost:5000/feedback', requestOptions)
+         .then(response => alert(response.status))  // alerts whether sent or not
    }
 
   return (
@@ -97,6 +125,8 @@ const App = () => {
                                     sortBy={sortBy}
                                     search={search}
                                     results={results}
+
+                                    sendFeedback={sendFeedback}
                                  />
          }
      </div>
