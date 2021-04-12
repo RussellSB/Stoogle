@@ -36,7 +36,9 @@ def search():
     #     "tags": ["action"]
     # }
 
-    results = search_engine.search(body['searchTerm'], body['boolOp'], body['filterOp'], body['categoryThreshold'], body['categoryFilter'], body['totalDocs'])
+    #results = search_engine.search(body['searchTerm'], body['boolOp'], body['filterOp'], body['categoryThreshold'], body['categoryFilter'], body['totalDocs'])
+    results = search_engine.search(body['searchTerm'])
+    
 
     search_engine.tag_filter(results,True,[])
 
@@ -44,7 +46,7 @@ def search():
         results = search_engine.sorting(results, True, body['sortBy'], bool(body['isAscending']))
 
     if body['needFilter'] == 1:
-        results = search_engine.filtering(results, True, body['categories'])
+        results = search_engine.filtering(results, True, body['categoryThreshold'], body['categoryFilter'])
 
     if len(body["tags"]) > 0:
         results = search_engine.tag_filter(results, True, body['tags'])
