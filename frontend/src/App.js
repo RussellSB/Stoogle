@@ -25,15 +25,17 @@ const App = () => {
          "searchTerm": search,
          "boolOp": 1,  // index of the list-item ['must', 'should', 'match']
          "filterOp": 0,  // 0 for less than, return items less than categoryThreshold
+         "needFilter": 1,  // set to use the category filter
          "categoryFilter": 0, // index of the list-item ['price', 'rating', 'owners']
          "categoryThreshold": maxPrice,  // effectively MaxPrice
          "totalDocs": 20,
          "needSort": needSort,  // Set to 0 for Relevancy, 1 for rest
          "sortBy": [sortBy], // either Rating or Owners
          "isAscending": 1, 
-         "needFilter": 0,  // set to false
          "tags": tags
       }
+
+      console.log('payload', payload)
 
       const requestOptions = {
          method: 'POST',
@@ -48,7 +50,7 @@ const App = () => {
          .then(response => response.json())
          .then(data => {
 
-            console.log(data)
+            console.log('data', data)
             const d = []  // list to store objects of information
          
             let i = 0

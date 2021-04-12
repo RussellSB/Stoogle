@@ -37,9 +37,8 @@ def search():
     # }
 
     #results = search_engine.search(body['searchTerm'], body['boolOp'], body['filterOp'], body['categoryThreshold'], body['categoryFilter'], body['totalDocs'])
-    results = search_engine.search(body['searchTerm'])
+    results = search_engine.search(body['searchTerm'], body['totalDocs'])
     
-
     search_engine.tag_filter(results,True,[])
 
     if body['needSort'] == 1:

@@ -277,7 +277,7 @@ def generate_settings(text):
     
     global df_queries
     df_queries = df_queries.append(
-        {'query': str(settings), 'query-matching': selection_index, 'q-precision': 0, 'p@cutoff': 0, 's-precision': 0, 'DCG': 0,
+        {'query': str(settings), 'query-matching': 2, 'q-precision': 0, 'p@cutoff': 0, 's-precision': 0, 'DCG': 0,
          'hits': 0, 'time-lag': 0},
         ignore_index=True)
 
@@ -294,20 +294,17 @@ def main():
     # index/update steamapps from csv file
     indexSteamApps(es, datasetPath)
 
-def search(searchTerm, boolOp, filterOp, categoryThreshold, categoryFilter, totalDocs):
+def search(searchTerm, totalDocs):
     print('====NEW SEARCH =====')
-    selection_index = 2
-    title = searchTerm
-    bool_op_index = boolOp
-    categories_index = categoryFilter
-    filter_operation_index = filterOp
-    threshold = categoryThreshold
-    total_docs = totalDocs
+    # title = searchTerm
+    # bool_op_index = boolOp
+    # categories_index = categoryFilter
+    # filter_operation_index = filterOp
+    # threshold = categoryThreshold
+    # total_docs = totalDocs
 
-    settings = generate_settings(selection_index, title, bool_op_index, categories_index, filter_operation_index,
-                                     threshold)
-
-    return query(es, settings, total_docs)
+    settings = generate_settings(searchTerm)
+    return query(es, settings, totalDocs)
 
 def evaluate(feedback_list = []):
     print('====EVALUATION =====')
