@@ -180,7 +180,7 @@ def sorting(df, en, sorting_criteria, ascending):
     """
 
     if en:
-        df = df.sort_values(by=sorting_criteria, ascending=ascending)
+        df = df.sort_values(by=sorting_criteria, ascending=ascending, ignore_index=True)
     return df
 
 def filtering(df, en, items):
