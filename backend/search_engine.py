@@ -183,14 +183,15 @@ def sorting(df, en, sorting_criteria, ascending):
         df = df.sort_values(by=sorting_criteria, ascending=ascending, ignore_index=True)
     return df
 
-def filtering(df, en, items):
+def filtering(df, en, threshold, index):
     """
     :param df: an input dataframe
     :param items: the columns you would like to keep
     :return: dataframe with specified columns
     """
+    categories = ['PRICE', 'RATING', 'OWNERS']
     if en:
-        df = df.filter(items=items)
+        df = df[df[categories[index]] <= threshold]
     return df
 
 def tag_filter(df, en, tags=[]):
@@ -220,6 +221,7 @@ def print_the_data(result, sorted_data, filtered_data, data_with_string):
     print('=================')
     print(data_with_string)
 
+"""
 def generate_settings(selection_index, text, bool_op_index, categories_index, filter_operation_index, threshold):
     # test query
     bool_op = ['must', 'should', 'match']
@@ -263,7 +265,24 @@ def generate_settings(selection_index, text, bool_op_index, categories_index, fi
         ignore_index=True)
 
     return settings
+"""
+              
+def generate_settings(text):
 
+    settings0 = {'bool': {'should': {'match': {'name': text}}}}
+    settings1 = {'bool': {'should': {'match': {'tags': text}}}}
+    settings2 = {'bool': {'should': {'match': {'short_description': text}}}}
+
+    settings = [settings0, settings1, settings2]
+    
+    global df_queries
+    df_queries = df_queries.append(
+        {'query': str(settings), 'query-matching': selection_index, 'q-precision': 0, 'p@cutoff': 0, 's-precision': 0, 'DCG': 0,
+         'hits': 0, 'time-lag': 0},
+        ignore_index=True)
+
+    return settings
+              
 def main():
     # preprocess data
     steamtPath = 'data/steam.csv'
