@@ -1,0 +1,2 @@
+query,q-precision,p@cutoff,s-precision,DCG,hits,time-lag
+"[{'bool': {'should': {'match': {'name': 'Test'}}}}, {'bool': {'should': {'match': {'tags': 'Test'}}}}, {'bool': {'should': {'match': {'short_description': 'Test'}}}}] PRICE<=6 tags = ['action']",0.6,"[0.0, 0.5, 0.33, 0.5, 0.4, 0.5, 0.57, 0.5, 0.56, 0.6]",0.6,4.13,11,20.0

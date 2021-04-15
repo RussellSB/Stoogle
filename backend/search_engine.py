@@ -163,9 +163,6 @@ def query(es, settings, total_docs):
         result = pd.DataFrame(dict)  # output dictionary as a dataframe and return the dataframe
         results.append(result)
 
-    global df_queries
-    df_queries.iloc[-1, 5] = total_hits
-    df_queries.iloc[-1, 6] = total_time
     result = pd.concat(results, ignore_index=True) # put all dataframes together
     result = result.drop_duplicates() # get rid of all duplicates
 
@@ -255,11 +252,16 @@ def search(searchTerm, totalDocs):
     print('====NEW SEARCH =====')
 
     settings = generate_settings(searchTerm)
-    return query(es, settings, totalDocs)
+    results =query(es, settings, totalDocs)
 
-def evaluate(feedback_list = []):
+    global df_queries
+    df_queries.iloc[-1, 5] = len(results)
+    return results
+
+def evaluate(feedback_list = [], time_lag= 0.0):
     print('====EVALUATION =====')
     global df_queries
+    df_queries.iloc[-1, 6] = time_lag
 
     # Query-specific precision
     count_dict = Counter(feedback_list)

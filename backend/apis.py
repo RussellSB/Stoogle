@@ -145,7 +145,8 @@ def tag_filter():
 def feedback():
     body = request.get_json()
     feedback_list = body['Results']
-    search_engine.evaluate(feedback_list)
+    time_lag = body['Time']
+    search_engine.evaluate(feedback_list, time_lag)
     return Response(status=200)
 
 
