@@ -13,9 +13,12 @@ const App = () => {
    const [page, setPage] = useState('onboarding') // onboarding
 
    const [results, setResults] = useState([])  // stores the retrieved data parsed correctly
+   const [responseTime, setResponseTime] = useState(0)
   	
    // Searches for results from API - linked to backend
-   const onSearch = () => {    
+   const onSearch = () => {   
+      
+      let t1 = performance.now()
 
       // Handles sort by
       let needSort = 0
@@ -68,6 +71,9 @@ const App = () => {
 
             setResults(d)
             setPage('results')
+
+            let t2 = performance.now()
+            setResponseTime((t2-t1).toFixed(0)) // Sets the response time for feedback
             
          })
    }
@@ -90,7 +96,9 @@ const App = () => {
       }
 
       // Send to API
-      const payload = {"Results":feedback}
+      const payload = {"Results":feedback, "Time": responseTime}
+
+      console.log(payload)
 
       const requestOptions = {
          method: 'POST',
