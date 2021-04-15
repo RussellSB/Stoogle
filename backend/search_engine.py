@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 steamAppsIndex = 'steamapps'
 es = Elasticsearch()
 
-column_headers = ['query','query-matching','q-precision','p@cutoff','s-precision','DCG','hits','time-lag']
+column_headers = ['query','q-precision','p@cutoff','s-precision','DCG','hits','time-lag']
 df_queries = pd.DataFrame(columns = column_headers)
 
 def preprocess(steamtPath, tagsPath, descriptionPath, outputPath):
@@ -164,8 +164,8 @@ def query(es, settings, total_docs):
         results.append(result)
 
     global df_queries
-    df_queries.iloc[-1, 6] = total_hits
-    df_queries.iloc[-1, 7] = total_time
+    df_queries.iloc[-1, 5] = total_hits
+    df_queries.iloc[-1, 6] = total_time
     result = pd.concat(results, ignore_index=True) # put all dataframes together
     result = result.drop_duplicates() # get rid of all duplicates
 
@@ -192,9 +192,10 @@ def filtering(df, en, threshold, index):
     categories = ['PRICE', 'RATING', 'OWNERS']
     if en:
         df = df[df[categories[index]] <= threshold]
+        df_queries.iloc[-1, 0] = df_queries.iloc[-1, 0]+' '+categories[index]+'<='+str(threshold)
     return df
 
-def tag_filter(df, en, tags=[]):
+def tag_filter(df, en, tags):
     """
     :param df: input data frame
     :param category: the column you would like to search a string for
@@ -204,69 +205,25 @@ def tag_filter(df, en, tags=[]):
     if en:
         for tag in tags:
           df = df[df['TAGS'].str.contains(tag)]
+        if len(tags)> 0:
+            df_queries.iloc[-1, 0] = df_queries.iloc[-1, 0] + ' tags = ' + str(tags)
     return df
 
-def print_the_data(result, sorted_data, filtered_data, data_with_string):
-    pd.set_option('max_columns', 6)  # this is to print out all columns
-    print('============')
-    print('Sorted Data')
-    print('============')
-    print(sorted_data)
-    print('=============')
-    print('Filtered Data')
-    print('=============')
-    print(filtered_data)
-    print('=================')
-    print('Data With String')
-    print('=================')
-    print(data_with_string)
+# def print_the_data(result, sorted_data, filtered_data, data_with_string):
+#     pd.set_option('max_columns', 6)  # this is to print out all columns
+#     print('============')
+#     print('Sorted Data')
+#     print('============')
+#     print(sorted_data)
+#     print('=============')
+#     print('Filtered Data')
+#     print('=============')
+#     print(filtered_data)
+#     print('=================')
+#     print('Data With String')
+#     print('=================')
+#     print(data_with_string)
 
-"""
-def generate_settings(selection_index, text, bool_op_index, categories_index, filter_operation_index, threshold):
-    # test query
-    bool_op = ['must', 'should', 'match']
-    filter_operation = ['lte', 'gt']
-    categories = ['price', 'rating', 'owners']
-
-    selection_index = selection_index % 3
-
-    if selection_index == 0:
-        # print('MATCH: ', title)
-        settings0 = {"match": {'name': text}}  # match operator
-        settings1 = {"match": {'tags': text}}
-        settings2 = {"match": {'short_description': text}}
-    elif selection_index == 1:
-        # print('BOOL: ', bool_op[bool_op_index], title)
-        settings0 = {'bool': {bool_op[bool_op_index]: [{'match': {'name': text}}]}}  # bool must operator
-        settings1 = {'bool': {bool_op[bool_op_index]: [{'match': {'tags': text}}]}}  # bool must operator
-        settings2 = {'bool': {bool_op[bool_op_index]: [{'match': {'short_description': text}}]}}  # bool must operator
-
-    elif selection_index == 2:
-        print('BOOL: ', bool_op[bool_op_index], text, categories[categories_index], filter_operation[filter_operation_index], threshold)
-        settings0 = {'bool': {bool_op[bool_op_index]: {'match': {'name': text}}, "filter": {"range": {
-            categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
-        settings1 = {'bool': {bool_op[bool_op_index]: {'match': {'tags': text}}, "filter": {"range": {
-            categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
-        settings2 = {'bool': {bool_op[bool_op_index]: {'match': {'short_description': text}}, "filter": {"range": {
-            categories[categories_index]: {filter_operation[filter_operation_index]: threshold}}}}}  # filter operation
-
-    else:
-        settings = None
-        print('No Instruction Found')
-
-    settings = [settings0, settings1, settings2]
-
-    
-    # check this - settings is no longer a single output but a list of outputs
-    global df_queries
-    df_queries = df_queries.append(
-        {'query': str(settings), 'query-matching': selection_index, 'q-precision': 0, 'p@cutoff': 0, 's-precision': 0, 'DCG': 0,
-         'hits': 0, 'time-lag': 0},
-        ignore_index=True)
-
-    return settings
-"""
-              
 def generate_settings(text):
 
     settings0 = {'bool': {'should': {'match': {'name': text}}}}
@@ -277,7 +234,7 @@ def generate_settings(text):
     
     global df_queries
     df_queries = df_queries.append(
-        {'query': str(settings), 'query-matching': 2, 'q-precision': 0, 'p@cutoff': 0, 's-precision': 0, 'DCG': 0,
+        {'query': str(settings), 'q-precision': 0, 'p@cutoff': 0, 's-precision': 0, 'DCG': 0,
          'hits': 0, 'time-lag': 0},
         ignore_index=True)
 
@@ -296,12 +253,6 @@ def main():
 
 def search(searchTerm, totalDocs):
     print('====NEW SEARCH =====')
-    # title = searchTerm
-    # bool_op_index = boolOp
-    # categories_index = categoryFilter
-    # filter_operation_index = filterOp
-    # threshold = categoryThreshold
-    # total_docs = totalDocs
 
     settings = generate_settings(searchTerm)
     return query(es, settings, totalDocs)
@@ -315,13 +266,13 @@ def evaluate(feedback_list = []):
     q_precision = count_dict['Yes']/len(feedback_list)
     q_precision = round(q_precision,2)
     print('Q-precision:'+str(q_precision))
-    df_queries.iloc[-1, 2] = q_precision
+    df_queries.iloc[-1, 1] = q_precision
 
     # System-wide precision
     s_precision = df_queries['q-precision'].sum()/df_queries.shape[0]
     s_precision = round(s_precision,2)
     print('S-precision:' + str(s_precision))
-    df_queries.iloc[-1, 4]  = s_precision
+    df_queries.iloc[-1, 3]  = s_precision
 
     # Precision at cut-off
     p_cutoffs = []
@@ -330,7 +281,7 @@ def evaluate(feedback_list = []):
         p_cutoff = count_dict_p_cutoff['Yes'] / i
         p_cutoffs.append(round(p_cutoff,2))
         print('precision @ cutoff '+str(i)+': ' + str(p_cutoff))
-        df_queries.iloc[-1, 3] = str(p_cutoffs)
+        df_queries.iloc[-1, 2] = str(p_cutoffs)
 
     # Discounted Cumulative Gain
     DCG = 0
@@ -339,7 +290,7 @@ def evaluate(feedback_list = []):
     for i in range(1, p):
         DCG += (pow(2,feedback_list_int[i])-1)/(math.log(1+i))
     DCG = round(DCG,2)
-    df_queries.iloc[-1, 5] = DCG
+    df_queries.iloc[-1, 4] = DCG
     print('DCG:' + str(DCG))
 
     if os.path.exists('evaluation\df_queries.csv'):
@@ -348,18 +299,21 @@ def evaluate(feedback_list = []):
         df_queries.tail(1).to_csv('evaluation\df_queries.csv', mode='a', header=False, index=False)
     else:
         df_queries.to_csv(r'evaluation\df_queries.csv', index=False)
+        df = df_queries
 
     #code to plot p@cutoff curves
-    x = [i+1 for i in range(10)]
-    plt.title('Precision at cutoff for each query')
-    plt.xlabel('Cutoff')
-    plt.ylabel('Precision')
-    for i in range(df.shape[0]):
-        y = str2list(df.iloc[i, 3])
-        plt.plot(x, y, label = "Query"+str(i+1))
-
-    plt.legend(loc='best')
-    plt.savefig('evaluation\plot'+str(df.shape[0])+'.png')
+    # x = [i+1 for i in range(10)]
+    # plt.title('Precision at cutoff for each query')
+    # plt.xlabel('Cutoff')
+    # plt.ylabel('Precision')
+    # for i in range(df.shape[0]):
+    #     y = str2list(df.iloc[i, 2])
+    #     plt.plot(x, y, label = "Query"+str(i+1))
+    #
+    # plt.legend(loc='best')
+    # plt.savefig('evaluation\plot'+str(df.shape[0])+'.png')
+    # plt.pause(5)
+    #plt.clf() # clear plot
 
 def str2list(str_data):
     str_data = str_data.strip('"')

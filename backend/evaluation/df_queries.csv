@@ -1,7 +1,0 @@
-query,query-matching,q-precision,p@cutoff,s-precision,DCG,hits,time-lag
-"{'bool': {'must': {'match': {'name': 'Counter-Strike'}}, 'filter': {'range': {'price': {'lt': 3}}}}}",2,0.5,"[1.0, 1.0, 0.67, 0.5, 0.6, 0.5, 0.43, 0.5, 0.44, 0.5]",0.5,2.98,30,0.009459
-"{'bool': {'must': {'match': {'name': 'Counter-Strike'}}, 'filter': {'range': {'price': {'lt': 3}}}}}",2,0.5,"[1.0, 0.8, 0.67, 0.4, 0.6, 0.5, 0.43, 0.5, 0.44, 0.5]",0.5,2.98,30,0.0336581
-"{'bool': {'must': {'match': {'name': 'Counter-Strike'}}, 'filter': {'range': {'price': {'lt': 3}}}}}",2,0.5,"[1.0, 1.0, 0.67, 0.5, 0.6, 0.5, 0.43, 0.5, 0.44, 0.5]",0.5,2.98,30,0.0342242
-"{'bool': {'must': {'match': {'name': 'Counter-Strike'}}, 'filter': {'range': {'price': {'lt': 3}}}}}",2,0.5,"[1.0, 1.0, 0.67, 0.5, 0.6, 0.5, 0.43, 0.5, 0.44, 0.3]",0.5,2.98,30,0.0387614
-"{'bool': {'must': {'match': {'name': 'Counter-Strike'}}, 'filter': {'range': {'price': {'lt': 3}}}}}",2,0.4,"[1.0, 1.0, 0.67, 0.5, 0.6, 0.5, 0.43, 0.5, 0.44, 0.4]",0.45,2.54,30,0.03255660000002081
-"{'bool': {'must': {'match': {'name': 'Counter-Strike'}}, 'filter': {'range': {'price': {'lt': 3}}}}}",2,0.5,"[1.0, 1.0, 0.67, 0.5, 0.6, 0.5, 0.43, 0.5, 0.44, 0.5]",0.5,2.98,30,0.021965199999982588
