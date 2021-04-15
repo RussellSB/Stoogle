@@ -308,18 +308,18 @@ def evaluate(feedback_list = [], time_lag= 0.0):
         df = df_queries
 
     #code to plot p@cutoff curves
-    # x = [i+1 for i in range(10)]
-    # plt.title('Precision at cutoff for each query')
-    # plt.xlabel('Cutoff')
-    # plt.ylabel('Precision')
-    # for i in range(df.shape[0]):
-    #     y = str2list(df.iloc[i, 2])
-    #     plt.plot(x, y, label = "Query"+str(i+1))
-    #
-    # plt.legend(loc='best')
-    # plt.savefig('evaluation\plot'+str(df.shape[0])+'.png')
-    # plt.pause(5)
-    # plt.clf() # clear plot
+    x = [i+1 for i in range(10)]
+    plt.title('Precision at cutoff for each query')
+    plt.xlabel('Cutoff')
+    plt.ylabel('Precision')
+    for i in range(df.shape[0]):
+        y = str2list(df.iloc[i, 2])
+        plt.plot(x, y, label = "Query"+str(i+1))
+
+    plt.legend(loc='best')
+    plt.savefig('evaluation\plot'+str(df.shape[0])+'.png')
+    plt.pause(5)
+    plt.clf() # clear plot
 
 def str2list(str_data):
 
