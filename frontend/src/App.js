@@ -24,11 +24,14 @@ const App = () => {
       let needSort = 0
       if (sortBy != 'relevancy'){needSort = 1}
 
+      let needFilter = 0
+      if(maxPrice < 500){needFilter = 1}
+
       const payload = {
          "searchTerm": search,
          "boolOp": 1,  // index of the list-item ['must', 'should', 'match']
          "filterOp": 0,  // 0 for less than, return items less than categoryThreshold
-         "needFilter": 1,  // set to use the category filter
+         "needFilter": needFilter,  // set to use the category filter
          "categoryFilter": 0, // index of the list-item ['price', 'rating', 'owners']
          "categoryThreshold": maxPrice,  // effectively MaxPrice
          "totalDocs": 20,
@@ -110,7 +113,7 @@ const App = () => {
       }
 
       fetch('http://localhost:5000/feedback', requestOptions)
-         .then(response => alert(response.status))  // alerts whether sent or not
+         .then(response => console.log('feedback', response.status))  // alerts whether sent or not
    }
 
   return (
