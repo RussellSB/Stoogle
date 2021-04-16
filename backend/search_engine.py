@@ -288,14 +288,17 @@ def evaluate(feedback_list = [], time_lag= 0.0):
         df_queries.iloc[-1, 2] = str(p_cutoffs)
 
     # Discounted Cumulative Gain
-    DCG = 0
+    DCG_list =[]
     p = len(feedback_list) # number of documents retrieved
     feedback_list_int = [1 if f == 'Yes' else 0 for f in feedback_list]
-    for i in range(1, p):
-        DCG += (pow(2,feedback_list_int[i])-1)/(math.log(1+i))
-    DCG = round(DCG,2)
-    df_queries.iloc[-1, 4] = DCG
-    print('DCG:' + str(DCG))
+    for r in range(1, p):
+        DCG = feedback_list_int[0]
+        for i in range(1, r):
+            DCG += (pow(2,feedback_list_int[i])-1)/(math.log(1+i))
+        DCG = round(DCG,3)
+        DCG_list.append(DCG)
+    df_queries.iloc[-1, 4] = str(DCG_list)
+    print('DCG:' + str(DCG_list))
 
     df_queries.iloc[-1, 6] = time_lag
 
@@ -322,7 +325,6 @@ def evaluate(feedback_list = [], time_lag= 0.0):
     plt.clf() # clear plot
 
 def str2list(str_data):
-
     str_data = str_data.strip('"')
     str_data = str_data.strip('[')
     str_data = str_data.strip(']')
